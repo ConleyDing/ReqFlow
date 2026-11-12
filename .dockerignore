@@ -1,0 +1,12 @@
+# 防止敏感文件与无关内容进入镜像构建上下文（构建上下文为仓库根）
+.git
+deploy/.env
+artifacts/
+docs/
+templates/
+
+# 数据库备份与日志（与.gitignore防护面对齐；备份流程会在仓库根产生backup.sql）
+*.sql
+*.dump
+*.log
+backups/

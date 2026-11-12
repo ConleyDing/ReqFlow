@@ -15,10 +15,12 @@
 - CONTRIBUTING.md：贡献流程。
 - CODE_OF_CONDUCT.md：协作行为准则。
 - CHANGELOG.md：版本变更。
+- THIRD-PARTY-NOTICES.md：第三方依赖许可证清单，Release前按Day 2-7锁定的版本复核更新。
 - .gitignore：排除密钥、构建产物、数据库备份。
+- .dockerignore：Docker构建上下文排除规则（与.gitignore防护面对齐，排除*.sql、*.dump、*.log、backups/等）。
 - docs/：工程文档。
 - frontend/、backend/、tests/、deploy/：源代码、测试和部署。
-- `.env.example`：仅包含配置键和安全占位值。
+- `deploy/.env.example`：仅包含配置键和安全占位值。
 
 ## 4. 发布步骤
 
@@ -28,7 +30,7 @@
 4. 执行测试和安全检查，记录版本号、Commit SHA和测试报告。
 5. 创建Release候选版并由两人复核。
 6. 核心验收通过后打`v1.0.0`标签并发布Release。
-7. 发布截图、操作视频、文档链接和问题反馈渠道。
+7. 发布截图、操作视频、文档链接和问题反馈渠道；`ReqFlow_AI_项目汇报.pptx`与`ReqFlow_AI_系统操作演示.mp4`以Release附件发布。
 8. 后续Issue按Bug/Feature/Docs分类维护。
 
 ## 5. README必须展示
@@ -38,8 +40,10 @@
 ## 6. 发布前检查
 
 - [ ] 公开仓库真实可访问。
-- [ ] LICENSE版权主体已确认。
+- [ ] LICENSE 版权主体已替换为真实团队信息、正文仅含标准 MIT 文本（无占位符、无批注）。
 - [ ] 依赖许可证已检查。
+- [ ] CODE_OF_CONDUCT联系渠道已补充为真实有效方式。
+- [ ] THIRD-PARTY-NOTICES.md已按锁定版本复核并随仓库发布。
 - [ ] 无真实API Key、密码、日志和用户数据。
 - [ ] 默认部署不会意外暴露数据库端口。
 - [ ] 未实现功能未标记为已完成。

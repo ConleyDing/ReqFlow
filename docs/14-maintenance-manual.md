@@ -1,12 +1,14 @@
 # 14 软件维护说明书
 
+> 本手册描述计划交付的运维方案。当前规划文档包尚不包含`frontend/`、`backend/`源码及两个Dockerfile，所述功能与维护流程尚未实现；实现后须按实际命令与验证记录校准，不得将文档/配置文件存在视为维护流程已验证。
+
 ## 1. 维护目标
 
 保障自托管MVP可启动、数据可恢复、AI配置可调整、依赖可更新，并确保代码、数据库迁移和工程文档一致。
 
 ## 2. 日常维护
 
-- 定期查看`docker compose ps`和服务日志。
+- 定期查看`docker compose --env-file deploy/.env -f deploy/docker-compose.yml ps`和服务日志。
 - 检查磁盘空间、PostgreSQL卷容量和备份文件。
 - 不在日志中记录API Key或敏感输入。
 - 重要更新前进行数据库备份。
@@ -18,9 +20,9 @@
 2. 停止非必要写入并备份数据库。
 3. 拉取新版本或Release。
 4. 检查`.env`新增/变更项。
-5. 执行Compose构建和启动，后端运行Alembic迁移。
+5. 执行Compose构建和启动，后端运行Alembic迁移。若仅backend镜像更新，升级后应同时重启web服务（或执行`nginx -s reload`），以刷新Nginx对上游容器地址的解析（静态proxy_pass仅在配置加载时解析）。
 6. 验证健康检查、项目读取、AI调用、导出和数据完整性。
-7. 若升级失败，保留日志和备份；按迁移兼容性计划回滚代码并恢复数据。
+7. 若升级失败，保留日志和备份；按迁移兼容性计划回滚代码，并按部署手册§8的恢复命令恢复数据（`pg_dump --clean --if-exists`产物会先删除同名对象再重建；仍建议优先在测试环境演练，恢复使用`psql -v ON_ERROR_STOP=1`）。
 
 ## 4. 数据维护
 
@@ -39,7 +41,7 @@
 
 ## 6. 故障排查顺序
 
-1. `docker compose ps`确认容器状态。
+1. `docker compose --env-file deploy/.env -f deploy/docker-compose.yml ps`确认容器状态。
 2. 查看web/backend/db日志。
 3. 检查数据库健康与连接配置。
 4. 检查Alembic迁移版本。

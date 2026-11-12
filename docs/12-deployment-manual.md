@@ -32,6 +32,7 @@
 - `backend/Dockerfile`的工作目录必须固定为`/app`，并把后端代码、`alembic/`、`alembic.ini`和锁定的Python依赖安装到镜像中，保证Compose命令`alembic upgrade head && uvicorn app.main:app ...`在该目录可执行。
 - `frontend/Dockerfile`采用多阶段构建：Node构建Vue静态资源，Nginx镜像负责运行；从仓库根构建上下文复制`deploy/nginx.conf`到`/etc/nginx/conf.d/default.conf`。
 - 若Web健康检查使用`wget`，最终Nginx镜像必须提供该命令；否则Dockerfile需安装探针依赖或将健康检查调整为镜像内确实存在的命令。
+- 构建上下文为仓库根；`.dockerignore`已排除`.git`、`deploy/.env`、`artifacts/`、`docs/`、`templates/`，防止真实密钥进入镜像构建上下文。
 - 两个Dockerfile不得依赖宿主机预装Node.js、Python或PostgreSQL。
 
 ## 5. 启动
@@ -86,14 +87,14 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
 
 ```bash
 docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
+  sh -c 'pg_dump --clean --if-exists -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
 ```
 
-恢复（先备份当前库，并优先在测试环境演练）：
+恢复（先备份当前库。--clean 产物会先删除同名对象再重建；仍建议优先在测试环境演练）：
 
 ```bash
 cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'psql -U "$POSTGRES_USER" "$POSTGRES_DB"'
+  sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" "$POSTGRES_DB"'
 ```
 
 ## 9. 常见问题
@@ -118,6 +119,8 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 ## 11. 干净环境部署验收
 
 使用未安装Python/Node/PostgreSQL的测试主机或干净虚拟机：
+
+本清单第4、5、8步中的compose命令均按§5完整形式执行（`docker compose --env-file deploy/.env -f deploy/docker-compose.yml …`）。
 
 1. 安装Docker和Compose v2。
 2. 克隆实际仓库。

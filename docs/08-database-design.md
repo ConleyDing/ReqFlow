@@ -14,6 +14,7 @@ erDiagram
   PROJECTS ||--o{ REQUIREMENTS : contains
   ANALYSIS_RUNS ||--o{ REQUIREMENTS : produces
   ANALYSIS_RUNS ||--o{ CLARIFICATION_QUESTIONS : produces
+  PROJECTS ||--o{ CLARIFICATION_QUESTIONS : contains
   REQUIREMENTS ||--o{ ACCEPTANCE_CRITERIA : has
   PROJECTS ||--o{ TEST_GENERATION_RUNS : has
   TEST_GENERATION_RUNS ||--o{ TEST_CASES : produces
@@ -120,6 +121,9 @@ erDiagram
 | result_json | JSONB | NULL | 校验后的结果 |
 | error_code | VARCHAR(80) | NULL | 失败错误码 |
 | error_message | TEXT | NULL | 脱敏错误描述 |
+| latency_ms | INTEGER | NULL | 调用耗时 |
+| input_tokens | INTEGER | NULL | 供应商返回时记录 |
+| output_tokens | INTEGER | NULL | 供应商返回时记录 |
 | created_at | TIMESTAMPTZ | NOT NULL | 创建时间 |
 | finished_at | TIMESTAMPTZ | NULL | 完成时间 |
 
@@ -141,13 +145,15 @@ erDiagram
 | created_at | TIMESTAMPTZ | NOT NULL | 创建时间 |
 | updated_at | TIMESTAMPTZ | NOT NULL | 更新时间 |
 
-约束：`UNIQUE(project_id, case_code)`；应用层确保关联需求处于CONFIRMED状态。索引：`(project_id, requirement_id)`、`(project_id, priority)`。
+约束：`UNIQUE(project_id, case_code)`。每条测试用例关联且仅关联一条需求（单一`requirement_id`）；生成与保存新用例时，其关联需求状态必须为CONFIRMED；既有用例的查看、编辑与导出不受该时点约束。索引：`(project_id, requirement_id)`、`(project_id, priority)`。
+
+用例生命周期约束说明：需求由CONFIRMED被编辑回DRAFT后，其既有用例保留——可查看、编辑、导出，不自动删除；重新生成用例时，在同一生成事务内先删除所选需求名下的旧用例再写入新用例（按需求替换，与全有或全有一致；生成失败不删旧用例）。
 
 ## 4. 数据完整性规则
 
 - 删除项目时关联数据级联删除；产品界面须二次确认。
 - 需求状态仅由业务服务校验后更新。
-- 测试用例必须且仅能关联同项目的一条已确认需求；后端保存前验证。
+- 每条测试用例关联且仅关联一条需求（单一`requirement_id`）；生成与保存新用例时，其关联需求状态必须为CONFIRMED，后端保存前验证；既有用例的查看、编辑与导出不受该时点约束。
 - 需求代码和业务测试用例代码（`REQ-001`、`CASE-001`）由服务层生成；为避免并发重复，生成时先对所属`projects`行执行`SELECT ... FOR UPDATE`，在同一事务内分配下一个编号，并由`UNIQUE(project_id, requirement_code)`和`UNIQUE(project_id, case_code)`作为最终保护。测试计划中的`TC-001`仅是测试执行用例编号，不是产品数据编号。
 - JSONB仅用于步骤列表、原始模型结果等变化较大的结构；查询频繁字段仍使用普通列。
 - 不保存API Key或Authorization信息。
@@ -166,14 +172,14 @@ erDiagram
 
 ```bash
 docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
+  sh -c 'pg_dump --clean --if-exists -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
 ```
 
-恢复（建议先在测试实例验证）：
+恢复（--clean 产物会先删除同名对象再重建；仍建议优先在测试环境演练）：
 
 ```bash
 cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'psql -U "$POSTGRES_USER" "$POSTGRES_DB"'
+  sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" "$POSTGRES_DB"'
 ```
 
 备份文件含用户需求数据，应限制访问权限并避免提交Git。

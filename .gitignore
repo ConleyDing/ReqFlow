@@ -28,6 +28,3 @@ dist/
 *.sql
 *.dump
 backups/
-
-# Generated artifacts
-artifacts/

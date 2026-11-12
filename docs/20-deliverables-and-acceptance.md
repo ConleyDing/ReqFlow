@@ -4,23 +4,26 @@
 
 | 类别 | 具体文件/成果 | 负责人 | 计划完成日 | 形成方式 | 验收证据 |
 |---|---|---|---|---|---|
-| 1 源代码 | frontend/、backend/、tests/、迁移、配置示例 | A前端；B后端 | Day 25 | 实际编码与审查 | Git提交、测试报告 |
-| 2 部署包/系统 | Dockerfile、Compose、Nginx配置、.env.example、部署手册 | B | Day 25 | 构建和干净环境验证 | 容器状态、访问截图、部署记录 |
+| 1 源代码 | frontend/、backend/、tests/、迁移、配置示例 | A前端；B后端 | Day 25 | 实际编码与审查 | Git提交、测试报告、lock文件已提交 |
+| 2 部署包/系统 | Dockerfile、Compose、Nginx配置、.env.example、部署手册 | B | Day 25 | 构建和干净环境验证 | 容器状态、访问截图、部署记录、lock文件已提交 |
 | 3 工程文档 | docs/全部设计、计划、测试、维护文档 | A/B分工 | Day 27 | 持续维护与最终核对 | 文档清单、评审记录 |
-| 4 开源社区 | 真实GitHub/Gitee仓库、LICENSE、README、Release | B主责，A协助 | Day 29 | 人工创建与发布 | 仓库URL、Release URL、Commit SHA |
-| 5 汇报PPT | 项目成果汇报.pptx | A主责 | Day 28 | 以真实截图和数据制作 | 文件、演练记录 |
-| 6 操作视频 | ReqFlow_AI_Demo.mp4 | A主责，B演示部署 | Day 28 | OBS录屏和剪辑 | 视频文件、播放检查 |
-| 7 项目总结 | 项目总结报告.md/docx | A/B共同 | Day 30 | 基于记录和实际证据填写 | 双方确认、证据链接 |
+| 4 开源社区 | 真实GitHub/Gitee仓库、LICENSE、README、Release | B主责，A协助 | Day 29 | 人工创建与发布 | 仓库URL、Release URL、Commit SHA、依赖许可证清单（THIRD-PARTY-NOTICES.md）已随仓库发布 |
+| 5 汇报PPT | ReqFlow_AI_项目汇报.pptx | A主责 | Day 28 | 以真实截图和数据制作 | 文件、演练记录 |
+| 6 操作视频 | ReqFlow_AI_系统操作演示.mp4 | A主责，B演示部署 | Day 28 初版，Day 29 定稿 | OBS录屏和剪辑 | 视频文件、播放检查 |
+| 7 项目总结 | project-summary.md | A/B共同 | Day 30 | 基于记录和实际证据填写 | 双方确认、证据链接 |
 
 ## 2. 最终验收表
 
 | 编号 | 验收项 | 完成标准 | 方法 | 实际状态/证据 |
 |---|---|---|---|---|
-| A-01 | 项目创建 | 新建、列表、编辑、删除可用 | TC-001至TC-004 | 待执行 |
+| A-01 | 项目创建 | 新建、列表、编辑、删除可用 | TC-001至TC-004、TC-034 | 待执行 |
+| A-01a | 需求输入校验 | 空文本/超长被拒绝且不调用模型 | TC-005、TC-027 | 待执行 |
 | A-02 | AI需求分析 | 实际调用模型并生成结构化需求 | TC-006/007 | 待执行 |
-| A-03 | AI错误处理 | 配置错误、超时、非法JSON处理正确 | TC-008/009 | 待执行 |
+| A-03 | AI错误处理 | 配置错误、超时、非法JSON处理正确 | TC-008/009、TC-026（超时状态展示） | 待执行 |
 | A-04 | 需求确认 | 可编辑需求、处理问题、确认状态 | TC-010至TC-013、TC-031（验收标准编辑） | 待执行 |
 | A-05 | AI用例生成 | 基于已确认需求生成且关联正确 | TC-014/015/032/033 | 待执行 |
+| A-05a | 测试用例编辑 | 修改步骤/预期结果后刷新不丢失 | TC-016 | 待执行 |
+| A-05b | 需求编辑状态联动与用例替换 | CONFIRMED需求被编辑后回DRAFT且旧用例保留可导出；重新确认并再次生成后，该需求旧用例被新用例替换，其他需求用例不受影响 | TC-035 | 待执行 |
 | A-06 | 导出 | Markdown和CSV可读取且字段正确 | TC-017/018 | 待执行 |
 | A-06a | 示例需求 | 静态示例填充/清空，不写入数据库直至提交 | TC-025 | 待执行 |
 | A-07 | PostgreSQL | 迁移成功、CRUD正确 | DB集成测试 | 待执行 |
@@ -44,10 +47,15 @@ ReqFlow-AI/
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
 ├── CHANGELOG.md
+├── THIRD-PARTY-NOTICES.md            # 第三方依赖许可证清单
+├── AUDIT_REPORT.md                   # 对抗性审查报告
+├── MASTER_PROJECT_DOCUMENT.md        # 完整规划总文档（docs/镜像）
 ├── .gitignore
+├── .dockerignore                     # Docker构建上下文排除规则
 ├── frontend/                         # 实际前端源码
 ├── backend/                          # 实际后端源码
 ├── tests/                            # 自动化测试
+├── tools/                            # 一致性检查脚本与结果清单（开发阶段创建，OPEN-10）
 ├── deploy/                           # Compose、Nginx、环境变量示例
 ├── docs/                             # 工程文档
 ├── templates/                        # 过程模板
@@ -59,9 +67,11 @@ ReqFlow-AI/
     └── project-summary.md
 ```
 
+PPT 与视频同时以 Release 附件发布（见 docs/15）。
+
 ## 4. 当前文档包的交付边界
 
-本压缩包当前交付的是规划与工程文档、部署配置草案和模板。对抗性审查详情见仓库根目录`AUDIT_REPORT.md`。它不包含实际`frontend/`、`backend/`、`tests/`源代码，也不包含`frontend/Dockerfile`和`backend/Dockerfile`；因此当前不能直接构建并运行完整系统。上述文件必须在开发期间按本基线创建，并在Day 25前完成Compose干净环境部署验证。不得将本规划包作为已完成的“源代码/部署包”提交。
+本压缩包当前交付的是规划与工程文档、部署配置草案和模板。对抗性审查详情见仓库根目录`AUDIT_REPORT.md`。它不包含实际`frontend/`、`backend/`、`tests/`源代码，也不包含`frontend/Dockerfile`和`backend/Dockerfile`；因此当前不能直接构建并运行完整系统。上述文件必须在开发期间按本基线创建，并在Day 25完成Compose干净环境部署验证。不得将本规划包作为已完成的“源代码/部署包”提交。LICENSE 当前为待定稿占位版本（版权主体于发布前替换，见 docs/15 §2）。
 
 ## 5. 最终签字
 

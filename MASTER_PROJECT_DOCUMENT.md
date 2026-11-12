@@ -1,6 +1,6 @@
 # ReqFlow AI 完整项目规划与工程文档
 
-**文档版本：** 0.2.1（经两轮对抗性文档审查修订）  
+**文档版本：** 0.2.3（经四轮对抗性文档审查修订）  
 **计划日期：** 2026-11-11至2026-12-10  
 **团队：** 2人  
 **项目状态：** 开发前规划基线；非可运行软件。
@@ -198,7 +198,7 @@
 - 项目创建、列表、详情、编辑、删除。
 - 输入自然语言需求并真实调用模型分析。
 - 提取需求条目、待确认问题、验收标准。
-- 修改和确认AI生成的需求/验收标准；回答或忽略澄清问题。问题答案只保存在问题记录中，不自动回写需求，用户需手动编辑相关需求/验收标准。
+- 修改和确认AI生成的需求/验收标准；回答或忽略澄清问题。问题答案只保存到问题记录中，不自动回写需求，用户需手动编辑相关需求/验收标准。
 - 根据已确认需求生成测试用例。
 - 测试用例编辑和保存。
 - 导出Markdown需求文档和CSV测试用例。
@@ -221,10 +221,9 @@
 ## 3. 范围变更规则
 
 - P0功能不得因临时创意被替换。
-- P1增强项仅在Day 20核心功能冻结且无P0缺陷时安排。
+- P1默认延期、不属于30天MVP验收；Day 20之后不再接受新功能开发（既定的测试、文档与发布任务除外），只处理缺陷修复与安全问题；启用任何P1须按范围变更规则经两名成员评审并记录。
 - 新需求必须记录收益、工作量、风险、对关键路径影响和取舍建议。
 - 任何新增功能都必须明确删除或推迟哪项工作；不得挤占最终测试、部署和交付时间。
-- Day 20之后原则上只允许修复缺陷和安全问题，不接受新增P1功能。
 
 ## 4. 工作分解结构（WBS）
 
@@ -242,6 +241,7 @@
 | 5.0 | 测试与质量 | 单元、接口、AI样本、回归、部署测试 | 测试报告、缺陷记录 |
 | 6.0 | 发布准备 | README、许可证、贡献指南、Release | 开源仓库发布 |
 | 6.1 | 成果展示 | PPT、操作视频、项目总结 | 汇报及总结材料 |
+| 6.2 | 交付文档 | 编写部署手册、用户手册、维护说明书并与当前实现核对（对应Day 26） | docs/12部署手册、docs/13用户手册、docs/14维护说明书 |
 | 7.0 | 项目收尾 | 验收、复盘、归档 | 最终交付包 |
 
 ## 5. 工作验收原则
@@ -279,13 +279,14 @@
 - 每日结束：更新任务看板、提交代码/文档、记录未完成原因。
 - 每2-3天：集成主分支，保证可运行版本。
 - 每个里程碑：开展演示和评审，记录问题、决定和行动人。
+- 每个迭代结束（Day 7、15、20、25及结项）：使用`templates/retrospective-template.md`开展迭代回顾，记录做得好的事项、问题根因、AI输出纠正结论和可量化改进项及负责人。
 - 每周至少一次：检查范围、进度、风险和关键路径。
 
 不要求固定开长会；协作内容优先写入Git Issue、Pull Request和会议记录。
 
 ## 3. 需求管理
 
-- 所有需求使用唯一编号：FR-xxx（功能）、NFR-xxx（非功能）、AI-xxx（AI专项）。
+- 所有需求使用唯一编号：FR-xxx（功能）、NFR-xxx（非功能）；AI专项需求统一纳入FR/NFR编号体系追踪，不另设AI-xxx编号。
 - 需求变更先登记，再评估工作量、风险和验收影响。
 - PRD基线由双方评审后冻结；冻结后修改必须更新版本与追踪矩阵。
 - AI提出的澄清问题不是已确认需求。用户可回答或标记忽略；回答仅保存到问题记录，不自动回写需求或触发AI重分析，用户需手动编辑相关需求/验收标准。未处理问题保持OPEN并持续提醒，不自动阻止用户对已核验需求作出明确确认。
@@ -293,6 +294,7 @@
 ## 4. 进度管理
 
 - 使用30天计划作为基线，每天更新任务状态：未开始/进行中/阻塞/完成/取消。
+- 功能开发任务在派发时按`templates/feature-task-template.md`建立任务单，登记需求编号、业务规则、验收标准与完成定义；任务状态随每日看板同步更新。
 - 以里程碑而非代码行数衡量进度。
 - 延期超过1天，先削减P1；延期超过2天，启动范围降级方案。
 - 核心路径不得省略：需求冻结→数据/API契约→后端AI链路→前端集成→回归→干净环境部署→发布。
@@ -313,6 +315,7 @@
 ## 6. 质量管理
 
 - 每项功能须有验收标准和至少一个测试用例。
+- 缺陷经每日Bug分诊确认后按`templates/bug-report-template.md`记录（要求见`docs/11`§9）；进入修复的缺陷由负责人另建`templates/bug-fix-task-template.md`修复任务单，覆盖根因分析、修复方案、回归测试与复测结果，跟踪至关闭。
 - 主分支保持可构建、可启动；功能分支经另一成员审查后合并。
 - 后端使用pytest；数据库集成测试必须连接PostgreSQL，不用SQLite替代。
 - AI输出必须经过Pydantic/JSON结构校验；AI评价需用固定测试样本。
@@ -354,15 +357,15 @@
 | Day/日期 | 阶段 | 成员A任务 | 成员B任务 | AI辅助方式 | 当日交付与验收 |
 |---|---|---|---|---|---|
 | 1 / 11-11 | 启动 | 目标用户与场景草案、仓库初始化 | 技术风险清单、API服务商候选 | AI辅助头脑风暴，人工筛选 | 项目章程、初始Issue；两人确认范围 |
-| 2 / 11-12 | 需求研究 | 访谈2-3名潜在用户或同学，记录原话 | 真实模型API连通Spike、请求/响应样例 | AI整理访谈，不生成虚构结论 | 访谈记录、API验证证据；至少一个模型可真实调用 |
+| 2 / 11-12 | 需求研究 | 访谈2-3名潜在用户或同学，记录原话 | 真实模型API连通Spike、请求/响应样例 | AI整理访谈，不生成虚构结论 | 访谈记录、API验证证据；至少一个模型可真实调用；记录语言/运行时/数据库及依赖可用版本（docs/25） |
 | 3 / 11-13 | 需求分析 | 用户故事、流程和页面清单 | AI能力边界、输出样本和风险 | AI生成用户故事初稿和边界样本 | PRD初稿、AI样例集 |
 | 4 / 11-14 | 需求基线 | 整理验收条件、优先级和非目标 | 审查可行性及AI需求 | AI检查歧义，人工最终裁决 | PRD 0.1基线、需求追踪矩阵；M1评审通过 |
 | 5 / 11-15 | 架构设计 | 低保真线框图、交互状态 | 总体架构、模块边界和部署视图 | AI辅助设计评审清单 | UI草图、系统架构图 |
 | 6 / 11-16 | 详细设计 | 页面组件、前端路由、API消费约定 | PostgreSQL ER、表结构、API契约 | AI审查字段和API一致性 | DB/API/UI设计评审通过 |
-| 7 / 11-17 | 工程骨架 | Vue项目初始化、Nginx静态托管 | FastAPI项目、PostgreSQL 17 Compose、健康检查 | AI生成Docker配置初稿并人工检查 | 三容器骨架启动；数据库健康；M2 |
+| 7 / 11-17 | 工程骨架 | Vue项目初始化、Nginx静态托管、前端测试框架选型验证（候选 Vitest） | FastAPI项目、PostgreSQL 17 Compose、健康检查 | AI生成Docker配置初稿并人工检查 | 三容器骨架启动；数据库健康；前端测试框架选型验证（候选 Vitest）完成；前后端依赖锁定并提交lock文件；M2 |
 | 8 / 11-18 | 后端基础 | 前端项目列表页面静态骨架 | SQLAlchemy模型、Alembic首个迁移 | AI生成ORM/迁移草稿 | PostgreSQL表创建成功，迁移可重复执行 |
 | 9 / 11-19 | 项目管理 | 项目列表/创建/详情UI | 项目CRUD API与测试 | AI生成接口测试初稿 | 前后端项目CRUD联调通过 |
-| 10 / 11-20 | AI基础 | 需求输入表单、加载/错误状态 | AI Provider适配层、配置、安全与超时 | AI检查供应商兼容性和异常路径 | 可读取模型配置；无Key时给出明确提示 |
+| 10 / 11-20 | AI基础 | 需求输入表单、加载/错误状态、示例需求静态文本+一键填入/清空（FR-014，标注示例输入，不写库） | AI Provider适配层、配置、安全与超时 | AI检查供应商兼容性和异常路径 | 可读取模型配置；无Key时给出明确提示；示例需求一键填入/清空可用（FR-014，标注示例输入，不写库） |
 | 11 / 11-21 | AI需求分析 | 需求结果页布局与数据映射 | 需求分析Prompt、JSON Schema、Pydantic模型 | AI对Prompt进行反例测试 | 固定样例可返回结构化需求和问题列表 |
 | 12 / 11-22 | AI链路 | 前端触发分析、显示进度 | 分析API、保存AnalysisRun和结果 | AI辅助编写异常处理及日志 | 浏览器可提交输入并真实生成结果 |
 | 13 / 11-23 | 数据编辑 | 需求条目、问题、验收标准编辑界面 | 需求/问题/验收条件持久化API | AI生成边界测试场景 | 编辑后刷新数据不丢失 |
@@ -379,7 +382,7 @@
 | 24 / 12-04 | 回归 | 端到端回归、问题复测 | 数据库迁移、备份恢复、容器健康测试 | AI辅助对照需求追踪 | P0用例通过，缺陷状态明确 |
 | 25 / 12-05 | 发布候选 | 演示脚本预演、截图素材准备 | 干净环境部署、Compose重建和数据持久化 | AI审查部署步骤和失败提示 | RC候选版；P0缺陷清零；M5 |
 | 26 / 12-06 | 文档 | 用户手册、UI截图、README使用部分 | 部署手册、维护手册、AI/DB文档核对 | AI整理文档草稿，人工对照实际实现 | 文档与当前代码一致 |
-| 27 / 12-07 | 开源准备 | README、PPT初稿、许可证检查 | 贡献指南、Changelog、发布检查 | AI辅助文案和拼写检查 | 仓库发布材料完整，密钥扫描通过 |
+| 27 / 12-07 | 开源准备 | README、PPT初稿、许可证检查；LICENSE定稿：LICENSE 版权主体已替换为真实团队信息、正文仅含标准 MIT 文本（无占位符、无批注） | 贡献指南、Changelog、发布检查、CODE_OF_CONDUCT联系方式定稿 | AI辅助文案和拼写检查 | 仓库发布材料完整，密钥扫描通过，THIRD-PARTY-NOTICES.md（第三方许可证清单） |
 | 28 / 12-08 | 成果展示 | PPT定稿、系统录屏 | 发布包、操作视频中的部署演示与复核 | AI辅助旁白和字幕初稿 | PPT、视频初版、演示环境冻结 |
 | 29 / 12-09 | 发布 | 汇报演练、检查视频与截图 | 创建真实Release、标签和部署包 | AI辅助最终清单核对 | 开源仓库和Release真实可访问；M6 |
 | 30 / 12-10 | 收尾 | 汇报、总结、收集评审反馈 | 最终验收、归档代码与证据 | AI协助整理复盘，人工核实 | 七类交付逐项签收、总结报告；M7 |
@@ -517,7 +520,7 @@ flowchart TD
 | FR-010 | AI测试用例生成 | 根据已确认需求生成测试用例 | P0 | 用例具备步骤、预期结果和需求关联 |
 | FR-011 | 编辑测试用例 | 修改前置条件、步骤、预期结果、优先级 | P0 | 保存后数据持久化 |
 | FR-012 | Markdown导出 | 导出项目需求及验收标准 | P0 | 文件编码UTF-8，内容与页面一致 |
-| FR-013 | CSV导出 | 导出测试用例 | P0 | UTF-8 BOM或兼容方式，列头稳定 |
+| FR-013 | CSV导出 | 导出测试用例 | P0 | UTF-8 with BOM，列头稳定 |
 | FR-014 | 示例需求输入 | 提供一段前端内置、无个人信息的示例需求文本，可一键填入输入框并清空 | P0 | 点击后只填充输入框并显示“示例输入”；未提交分析前不写入数据库 |
 | FR-015 | 测试用例质量建议 | 检查重复或缺失场景 | P1 | 作为建议，不自动覆盖用户内容 |
 | FR-016 | 需求模板 | 提供登录/注册等常用模板 | P1 | 模板可一键填充输入框 |
@@ -560,10 +563,10 @@ flowchart TD
 
 1. AI输出是草稿，不是权威需求；用户确认是业务状态变更的唯一入口。
 2. 只有`CONFIRMED`状态的需求参与测试用例生成；其他需求统一保持`DRAFT`。澄清问题使用独立的OPEN/RESOLVED/IGNORED状态。
-3. 每条测试用例必须关联且仅关联一条已确认需求（MVP数据模型采用单一`requirement_id`）。
+3. 每条测试用例关联且仅关联一条需求（单一`requirement_id`）；生成与保存新用例时，其关联需求状态必须为CONFIRMED；既有用例的查看、编辑与导出不受该时点约束。
 4. 不完整的信息应保持未知，不能由模型自行补齐为确定事实。
 5. 测试用例生成采用全有或全无：所选已确认需求中只要存在无法形成明确预期结果的需求，本次生成整体拒绝，不保存部分用例，并提示用户补充需求后重试。
-6. 澄清问题属于一次分析运行（analysis_run），不是自动绑定到某条需求。回答问题只将答案保存在问题记录中，不会自动回写需求、验收标准或重新调用AI；用户需手动把答案补充到相关需求/标准后再确认。存在未处理问题时系统持续显示提醒，但不自动替用户确认或拒绝需求。用户明确点击确认即代表其对当前需求内容作出人工确认；问题本身的OPEN状态不会因需求确认而自动改变。
+6. 澄清问题属于一次分析运行（analysis_run），不是自动绑定到某条需求。回答问题只将答案保存到问题记录中，不会自动回写需求、验收标准或重新调用AI；用户需手动把答案补充到相关需求/标准后再确认。存在未处理问题时系统持续显示提醒，但不自动替用户确认或拒绝需求。用户明确点击确认即代表其对当前需求内容作出人工确认；问题本身的OPEN状态不会因需求确认而自动改变。
 7. AI调用失败时，不得写入一份看似成功的空结果；保存失败状态和可理解错误。
 8. 删除项目前确认；项目删除采用数据库级级联删除，UI需提示相关需求和用例也会删除。
 
@@ -581,6 +584,7 @@ flowchart TD
 | NFR-008 | 可追踪性 | 每个测试用例关联需求ID；AI运行记录保存模型和Prompt版本 |
 | NFR-009 | 可恢复性 | 提供pg_dump备份和恢复步骤 |
 | NFR-010 | 性能 | 非AI列表/详情请求目标P95<500ms（本地演示环境目标，需实测）；AI调用耗时依赖外部服务，不承诺固定时延 |
+| NFR-011 | 健康检查 | db/backend/web三级健康检查，端点与判定见系统设计说明书（docs/07 §3）与部署手册（docs/12 §6） |
 
 ## 10. 页面清单
 
@@ -598,33 +602,13 @@ FR-001至FR-014全部通过；关键业务流程从项目创建到导出连续�
 
 ## 12. 用例说明
 
-### UC-01 创建项目
-- 参与者：用户。
-- 前置条件：系统可访问。
-- 主成功流程：打开项目列表→点击新建→填写名称和描述→提交→系统校验并保存→返回项目详情。
-- 备选流程：名称为空/过长→系统提示并保留输入；数据库不可用→显示保存失败，不清空内容。
-- 后置条件：项目记录存在于PostgreSQL。
+用例规格唯一主源为`docs/24-use-cases.md`；本节仅保留用例摘要与指针，不重复详细用例定义（参与者、前置条件、主/备选流程、后置条件），如两处表述不一致以docs/24为准。
 
-### UC-02 分析自然语言需求
-- 参与者：用户、外部大模型服务。
-- 前置条件：项目存在；AI配置有效；需求文本非空且未超限。
-- 主成功流程：用户输入→系统创建分析运行记录→后端请求模型→校验JSON→保存需求/问题/验收标准→展示结果。
-- 备选流程：未配置Key、网络失败、限流、超时或结构错误→显示明确错误和request_id；不生成伪造成功结果。
-- 后置条件：成功时分析记录为SUCCEEDED，结构化数据持久化；失败时记录FAILED。
-
-### UC-03 审阅并确认需求
-- 参与者：用户。
-- 前置条件：项目至少有一轮成功的需求分析。
-- 主成功流程：打开需求列表→查看来源摘录→修改需求/验收标准→处理待确认问题→点击确认→系统校验并保存状态。
-- 备选流程：需求仍有未解决关键问题→用户可继续保留草稿或明确确认；系统不得自动替用户确认。
-- 后置条件：确认需求状态为CONFIRMED，可供测试用例生成选择。
-
-### UC-04 生成并导出测试用例
-- 参与者：用户、外部大模型服务。
-- 前置条件：项目至少有一条CONFIRMED需求；AI服务可用。
-- 主成功流程：选择需求→发起生成→后端读取已确认需求和验收标准→请求模型→校验来源ID和字段→保存用例→用户编辑→导出CSV。
-- 备选流程：无确认需求→返回业务提示；模型失败→不保存不完整用例；导出失败→保留页面数据并提示重试。
-- 后置条件：测试用例与来源需求建立关联，可查询和导出。
+- UC-01 项目创建与管理：创建、编辑、删除项目并持久化，详见docs/24。
+- UC-02 AI需求分析：输入自然语言需求或加载示例需求，调用真实模型生成结构化分析结果，详见docs/24。
+- UC-03 审阅需求和澄清问题：编辑需求/验收标准、回答或忽略澄清问题、确认需求，详见docs/24。
+- UC-04 测试用例生成与导出：基于已确认需求生成、编辑并导出测试用例，详见docs/24。
+- UC-05 Docker部署与数据恢复：干净环境Compose部署、三级健康检查与备份恢复，详见docs/24。
 
 ---
 
@@ -642,7 +626,7 @@ AI不是独立聊天页，而是两项核心业务服务：
 ## 2. 模型接入策略
 
 - 后端建立统一`LLMProvider`接口，隔离供应商差异。
-- 配置项：`AI_BASE_URL`、`AI_API_KEY`、`AI_MODEL`、超时、输入长度、最大输出Token、重试次数。
+- 配置项：`AI_BASE_URL`、`AI_API_KEY`、`AI_MODEL`、超时、输入长度、最大输出Token、重试次数（`AI_MAX_RETRIES`，默认1；合并预算语义见§8）。
 - 第一版只接入一个已验证供应商；OpenAI兼容接口可作为适配方式，但不得假设所有供应商完全兼容。
 - 模型/服务商在Day 2通过真实调用Spike后冻结。
 - MVP不训练模型、不微调、不使用RAG、不构建Agent工具调用链。
@@ -651,26 +635,26 @@ AI不是独立聊天页，而是两项核心业务服务：
 
 ### 3.1 需求分析
 
-1. 校验项目存在、需求非空且未超长。
+1. 校验项目存在、需求非空且未超长；超长时返回422 `INPUT_TOO_LARGE`，不创建运行记录（错误码映射见§8与`docs/09-api-design.md`§8）。
 2. 创建`analysis_runs`记录，状态初始化为RUNNING。
 3. 清洗输入（去除无效控制字符，不擅自改写业务语义）。
 4. 构建Prompt：角色、任务、边界、结构化输出要求、用户原始需求。
 5. 请求模型。
 6. 解析JSON并执行Pydantic验证。
-7. 若结构错误，最多进行一次定向修复重试；不得无限重试。
+7. 若结构错误，最多进行一次定向修复重试；该重试与5xx网络退避重试共用合并预算（`AI_MAX_RETRIES=1`）：单次API请求内模型调用总计最多2次（首次调用+1次重试），任一先发生即消耗唯一重试机会，不叠加；不得无限重试。
 8. 校验通过后，在一个数据库事务中保存需求、问题和验收标准，分析记录标记成功。
 9. 返回结果；失败时记录可诊断错误，前端显示重试建议。
 
 ### 3.2 测试用例生成
 
-1. 读取项目中状态为CONFIRMED的需求和验收标准。
-2. 若没有确认需求，返回业务错误，不调用模型。
-3. 按输入长度限制选择需求；超限时提示用户缩小范围，不静默截断。
+1. 读取用户所选需求ID（`requirement_ids`）对应的需求和验收标准。
+2. 预检：拒绝情形恰为三种——当前项目没有已确认需求；所选需求ID不属于当前项目；所选需求ID状态不为CONFIRMED。任一命中即返回422 `NO_CONFIRMED_REQUIREMENTS`，不调用模型、不创建运行记录；不得静默过滤未确认或不属于本项目的ID后继续生成（与`docs/09-api-design.md`§5预检口径完全一致）。
+3. 校验所选需求文本总长度；超限时返回422 `INPUT_TOO_LARGE`并提示用户缩小范围，不静默截断、不创建运行记录。
 4. Prompt要求测试场景覆盖正常、异常、边界路径，且每条用例关联来源需求。
 5. 在调用模型前创建`test_generation_runs`记录，状态初始化为RUNNING，并保存所选需求ID、provider/model/prompt_version。
-6. 结构化输出校验通过后，在一个事务中保存全部`test_cases`并将运行记录更新为SUCCEEDED。
-7. 模型失败、输出不合法或发现所选需求信息不足时，将运行记录更新为FAILED并保存脱敏错误信息；不得保存部分测试用例。预检发现没有已确认需求或所选ID不属于当前项目时，不调用模型、不创建运行记录。
-8. 用户可以编辑成功生成的用例，不将AI输出视为最终测试结论。
+6. 结构化输出校验通过后，在同一事务中先删除所选需求名下的既有旧用例，再写入本次生成的全部`test_cases`，并将运行记录更新为SUCCEEDED；替换按需求进行，本次未选中需求的用例不受影响。
+7. 模型失败、输出不合法或发现所选需求信息不足时，将运行记录更新为FAILED并保存脱敏错误信息；不得保存部分测试用例，也不得删除旧用例（生成失败时所选需求的既有用例保持原样）。预检失败（第2步三种情形）时，不调用模型、不创建运行记录。
+8. 用户可以编辑成功生成的用例，不将AI输出视为最终测试结论；需求被编辑回DRAFT后，其既有用例保留（可查看、编辑、导出），不自动删除，待重新确认并再次生成时按需求整体替换。
 
 ## 4. 结构化输出契约
 
@@ -688,18 +672,35 @@ AI不是独立聊天页，而是两项核心业务服务：
       "priority": "high",
       "source_excerpt": "用户可以使用手机号注册账号",
       "acceptance_criteria": []
+    },
+    {
+      "temp_id": "R2",
+      "title": "手机号登录",
+      "description": "用户可使用手机号和密码登录。",
+      "requirement_type": "functional",
+      "priority": "high",
+      "source_excerpt": "并通过手机号和密码登录",
+      "acceptance_criteria": [
+        {"criterion_text": "用户使用已注册的手机号和密码可完成登录。"}
+      ]
     }
   ],
   "questions": [
     {
       "question": "注册时是否要求短信验证码？",
       "reason": "原始描述未说明手机号格式、验证方式和账号唯一性规则；在规则确认前不生成具体验收标准。"
+    },
+    {
+      "question": "密码重置时如何验证用户身份？",
+      "reason": "原文仅表述“忘记密码后可以重新设置密码”，未说明身份验证方式与重置流程；在规则确认前不生成对应需求和验收标准。"
     }
   ]
 }
 ```
 
 上述为结构样例，不代表某个模型已实际生成或具备准确率保证。
+
+`acceptance_criteria`元素结构定义：每条验收标准是一个对象，模型输出仅含一个字段`criterion_text`（字符串，非空，必须可观察、可验证），如上方R2中的`{"criterion_text": "用户使用已注册的手机号和密码可完成登录。"}`。字段名与数据库设计`acceptance_criteria`表的`criterion_text`列及API响应中的验收标准子对象对齐；`id`、`requirement_id`、`sort_order`、`created_at`、`updated_at`由后端持久化时生成，不属于模型输出。数组顺序即`sort_order`来源：后端按数组下标从0开始递增写入`sort_order`。某条需求缺少给出可验证标准所需的规则时，其`acceptance_criteria`为空数组，并将缺失规则写入`questions`（如上例R1），不得编造标准。
 
 ### 4.2 测试用例JSON示例
 
@@ -720,6 +721,19 @@ AI不是独立聊天页，而是两项核心业务服务：
   ]
 }
 ```
+
+`test_cases`与`error`互斥，单次模型输出必须二选一。若所选已确认需求中任何一条仍不足以设计明确预期结果，模型不输出`test_cases`，而是输出错误信号对象（HTTP状态码只能由后端产生，模型不返回422）：
+
+```json
+{
+  "error": {
+    "code": "INSUFFICIENT_REQUIREMENT_DETAIL",
+    "details": ["R2: 未说明密码错误时的处理规则，无法确定异常路径的预期结果"]
+  }
+}
+```
+
+`details`每个元素为`"<需求编号>: <缺失的信息>"`格式的字符串，其中需求编号使用本次生成上下文中的需求临时ID（即`requirement_temp_id`所指）。后端检测到该信号后转换为HTTP 422响应（`error.code=INSUFFICIENT_REQUIREMENT_DETAIL`），将对应生成运行记录置为FAILED并保存脱敏错误，不保存任何部分测试用例。临时ID仅用于模型-后端之间，对外响应由后端将其映射为对应需求的业务编号（`requirement_code`）与缺失信息摘要后放入`error.details`数组（结构与映射规定见`docs/09-api-design.md`§1、§5），用户可据此定位需补充的需求。
 
 ## 5. Prompt设计原则
 
@@ -749,7 +763,7 @@ AI不是独立聊天页，而是两项核心业务服务：
 你是软件测试设计助理。仅根据已确认需求和验收标准设计测试用例。
 覆盖适用的正常、异常和边界场景；不要发明未确认的业务规则。
 每条用例必须给出来源需求临时ID、前置条件、步骤、预期结果、类型和优先级。
-若所选已确认需求中任何一条仍不足以设计明确预期结果，则本次请求整体返回`422 INSUFFICIENT_REQUIREMENT_DETAIL`，不保存任何部分测试用例；用户需先手动补充需求/验收标准并保存，再重新确认和发起生成。MVP不保存独立的用例澄清问答。
+若所选已确认需求中任何一条仍不足以设计明确预期结果，则输出错误信号对象{"error":{"code":"INSUFFICIENT_REQUIREMENT_DETAIL","details":["<需求临时ID>: <缺失的信息>"]}}，不输出test_cases（两者互斥；HTTP 422状态码由后端依据该信号转换产生，后端不保存任何部分测试用例）；用户需先手动补充需求/验收标准并保存，再重新确认和发起生成。MVP不保存独立的用例澄清问答。
 输出必须符合指定JSON Schema。
 ```
 
@@ -767,17 +781,22 @@ AI不是独立聊天页，而是两项核心业务服务：
 
 ## 8. 异常处理
 
-| 异常 | 后端处理 | 用户提示 |
-|---|---|---|
-| 未配置API Key/Model | 不发起模型请求；若已创建`analysis_runs`记录，则将其标记为FAILED并记录配置缺失 | 请按部署说明配置AI服务 |
-| 网络/DNS失败 | 标记调用失败；若已创建运行记录则更新为FAILED，按错误类型执行有限重试 | 模型服务暂不可达，请检查网络 |
-| 401/403 | 不重试或只允许配置修复后重试 | API凭据或权限无效 |
-| 429/额度不足 | 不快速循环重试 | 服务限流或额度不足，请稍后重试/检查额度 |
-| 5xx | 最多一次退避重试 | 模型服务异常 |
-| 超时 | 终止请求，记录超时 | 处理超时，可缩短需求后重试 |
-| JSON无效 | 定向修复一次，仍失败则报错 | AI结果格式不符合要求，请重试 |
-| 输出截断 | 检测缺失字段/finish状态；不保存不完整结果 | 输出不完整，请拆分需求 |
-| 用户取消/重复提交 | 前端禁用重复按钮；后端使用请求状态约束 | 显示处理中或取消结果 |
+| 异常 | 错误码（HTTP状态） | 后端处理 | 用户提示 |
+|---|---|---|---|
+| 未配置API Key/Model | `AI_NOT_CONFIGURED`（503） | 不发起模型请求；若已创建`analysis_runs`记录，则将其标记为FAILED并记录配置缺失 | 请按部署说明配置AI服务 |
+| 网络/DNS失败 | `AI_PROVIDER_UNREACHABLE`（502） | 标记调用失败；若已创建运行记录则更新为FAILED，按错误类型执行有限重试 | 模型服务暂不可达，请检查网络 |
+| 401/403 | `AI_PROVIDER_AUTH_FAILED`（502） | 不重试或只允许配置修复后重试 | API凭据或权限无效 |
+| 429/额度不足 | `AI_RATE_LIMITED`（429） | 不快速循环重试 | 服务限流或额度不足，请稍后重试/检查额度 |
+| 5xx | `AI_PROVIDER_ERROR`（502，重试后仍失败） | 最多一次退避重试；与JSON结构修复重试共用合并预算，任一先发生即消耗唯一重试机会 | 模型服务异常 |
+| 超时 | `AI_PROVIDER_TIMEOUT`（504） | 终止请求，记录超时 | 处理超时，可缩短需求后重试 |
+| JSON无效 | `AI_INVALID_OUTPUT`（502，修复重试后仍失败） | 定向修复一次，仍失败则报错；与5xx退避重试共用合并预算，不叠加 | AI结果格式不符合要求，请重试 |
+| 输出截断 | `AI_INVALID_OUTPUT`（502） | 检测缺失字段/finish状态；不保存不完整结果 | 输出不完整，请拆分需求 |
+| 需求信息不足 | `INSUFFICIENT_REQUIREMENT_DETAIL`（422） | 模型输出`error.code=INSUFFICIENT_REQUIREMENT_DETAIL`错误信号（与`test_cases`互斥，见§4.2）；后端检测到后转换为HTTP 422，将运行记录置为FAILED并保存脱敏错误，不保存任何部分测试用例 | 部分需求缺少设计预期结果所需信息，请补充需求/验收标准并重新确认后重试 |
+| 用户取消/重复提交 | —（前端与请求状态拦截，无错误码） | 前端禁用重复按钮；后端使用请求状态约束 | 显示处理中或取消结果 |
+
+上表错误码与`docs/09-api-design.md`§8的AI错误码映射表一致；两类运行记录（`analysis_runs`/`test_generation_runs`）的`error_code`列（VARCHAR(80)）取值即该表，状态FAILED时写入对应码。预检类拒绝（输入超限422 `INPUT_TOO_LARGE`、生成预检422 `NO_CONFIRMED_REQUIREMENTS`）发生在模型调用之前且不创建运行记录，见§3与`docs/09-api-design.md`§5。
+
+重试预算统一口径：单次API请求内模型调用总计最多2次（首次调用+1次重试）；`AI_MAX_RETRIES=1`为5xx网络退避重试与JSON结构修复重试的合并预算——任一先发生即消耗唯一重试机会，不叠加。
 
 ## 9. Token与成本控制
 
@@ -785,7 +804,7 @@ AI不是独立聊天页，而是两项核心业务服务：
 - 设置输入字符数与输出Token上限。
 - 需求分析和用例生成使用独立Prompt版本号。
 - 记录供应商、模型、Prompt版本、请求耗时、Token用量（供应商提供时）。
-- 默认最多一次修复重试；不做多模型竞价和自动路由。
+- 默认`AI_MAX_RETRIES=1`（合并预算：单次API请求内模型调用总计最多2次，见§8）；不做多模型竞价和自动路由。
 - 建立日常手工成本记录；正式模型用量和单价以供应商实际账单为准。
 
 ## 10. 安全与隐私
@@ -956,20 +975,20 @@ sequenceDiagram
   User->>UI: 选择已确认需求并生成
   UI->>API: POST /projects/{id}/test-generation-runs
   API->>DB: 校验项目归属和CONFIRMED状态
-  alt 没有有效的已确认需求
+  alt 预检失败（三种拒绝情形之一）
     API-->>UI: 422 NO_CONFIRMED_REQUIREMENTS（不调用模型/不建运行记录）
   else 有效需求
     API->>DB: 创建RUNNING test_generation_run
     API->>AI: generate(canonical requirements)
     AI->>LLM: Prompt + Schema
-    LLM-->>AI: 用例JSON或信息不足错误
+    LLM-->>AI: 用例JSON或信息不足信号
     alt 输出可用且全部需求信息充分
       AI->>AI: 校验字段和需求ID映射
-      API->>DB: 事务保存全部用例并标记SUCCEEDED
-      API-->>UI: 返回用例列表
-    else 模型失败/信息不足/结构错误
+      API->>DB: 事务保存全部用例（先删除所选需求名下旧用例）并标记SUCCEEDED
+      API-->>UI: 201返回运行记录（内嵌items用例列表）
+    else 模型失败/信息不足信号/结构错误
       API->>DB: 标记FAILED并保存脱敏错误，不保存部分用例
-      API-->>UI: 返回明确业务错误
+      API-->>UI: 返回明确业务错误（信息不足信号由后端转换为422 INSUFFICIENT_REQUIREMENT_DETAIL）
     end
   end
 ```
@@ -988,12 +1007,16 @@ sequenceDiagram
 }
 ```
 
+`error`对象还可携带可选的`details`字符串数组，用于承载可定位的业务细节（如`INSUFFICIENT_REQUIREMENT_DETAIL`时给出各需求的`requirement_code`与缺失信息摘要）；完整结构与AI错误码映射表见`docs/09-api-design.md`§1、§8。
+
 - 400：请求格式错误。
 - 404：项目/需求/用例不存在。
 - 409：状态冲突或重复操作。
-- 422：字段校验或业务前置条件不满足。
-- 429：模型服务限流。
-- 502/503：模型服务或外部依赖不可用。
+- 422：字段校验或业务前置条件不满足（含`NO_CONFIRMED_REQUIREMENTS`、`INSUFFICIENT_REQUIREMENT_DETAIL`、`INPUT_TOO_LARGE`）。
+- 429：模型服务限流（`AI_RATE_LIMITED`）。
+- 502：上游模型调用失败（不可达`AI_PROVIDER_UNREACHABLE`、认证失败`AI_PROVIDER_AUTH_FAILED`、上游5xx`AI_PROVIDER_ERROR`、无效输出`AI_INVALID_OUTPUT`）。
+- 503：未配置AI（`AI_NOT_CONFIGURED`）。
+- 504：模型服务响应超时（`AI_PROVIDER_TIMEOUT`）。
 - 500：未预期服务异常；日志保留request_id，不向用户返回堆栈。
 
 ## 9. 安全设计
@@ -1078,6 +1101,7 @@ erDiagram
   PROJECTS ||--o{ REQUIREMENTS : contains
   ANALYSIS_RUNS ||--o{ REQUIREMENTS : produces
   ANALYSIS_RUNS ||--o{ CLARIFICATION_QUESTIONS : produces
+  PROJECTS ||--o{ CLARIFICATION_QUESTIONS : contains
   REQUIREMENTS ||--o{ ACCEPTANCE_CRITERIA : has
   PROJECTS ||--o{ TEST_GENERATION_RUNS : has
   TEST_GENERATION_RUNS ||--o{ TEST_CASES : produces
@@ -1184,6 +1208,9 @@ erDiagram
 | result_json | JSONB | NULL | 校验后的结果 |
 | error_code | VARCHAR(80) | NULL | 失败错误码 |
 | error_message | TEXT | NULL | 脱敏错误描述 |
+| latency_ms | INTEGER | NULL | 调用耗时 |
+| input_tokens | INTEGER | NULL | 供应商返回时记录 |
+| output_tokens | INTEGER | NULL | 供应商返回时记录 |
 | created_at | TIMESTAMPTZ | NOT NULL | 创建时间 |
 | finished_at | TIMESTAMPTZ | NULL | 完成时间 |
 
@@ -1205,13 +1232,15 @@ erDiagram
 | created_at | TIMESTAMPTZ | NOT NULL | 创建时间 |
 | updated_at | TIMESTAMPTZ | NOT NULL | 更新时间 |
 
-约束：`UNIQUE(project_id, case_code)`；应用层确保关联需求处于CONFIRMED状态。索引：`(project_id, requirement_id)`、`(project_id, priority)`。
+约束：`UNIQUE(project_id, case_code)`。每条测试用例关联且仅关联一条需求（单一`requirement_id`）；生成与保存新用例时，其关联需求状态必须为CONFIRMED；既有用例的查看、编辑与导出不受该时点约束。索引：`(project_id, requirement_id)`、`(project_id, priority)`。
+
+用例生命周期约束说明：需求由CONFIRMED被编辑回DRAFT后，其既有用例保留——可查看、编辑、导出，不自动删除；重新生成用例时，在同一生成事务内先删除所选需求名下的旧用例再写入新用例（按需求替换，与全有或全有一致；生成失败不删旧用例）。
 
 ## 4. 数据完整性规则
 
 - 删除项目时关联数据级联删除；产品界面须二次确认。
 - 需求状态仅由业务服务校验后更新。
-- 测试用例必须且仅能关联同项目的一条已确认需求；后端保存前验证。
+- 每条测试用例关联且仅关联一条需求（单一`requirement_id`）；生成与保存新用例时，其关联需求状态必须为CONFIRMED，后端保存前验证；既有用例的查看、编辑与导出不受该时点约束。
 - 需求代码和业务测试用例代码（`REQ-001`、`CASE-001`）由服务层生成；为避免并发重复，生成时先对所属`projects`行执行`SELECT ... FOR UPDATE`，在同一事务内分配下一个编号，并由`UNIQUE(project_id, requirement_code)`和`UNIQUE(project_id, case_code)`作为最终保护。测试计划中的`TC-001`仅是测试执行用例编号，不是产品数据编号。
 - JSONB仅用于步骤列表、原始模型结果等变化较大的结构；查询频繁字段仍使用普通列。
 - 不保存API Key或Authorization信息。
@@ -1230,14 +1259,14 @@ erDiagram
 
 ```bash
 docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
+  sh -c 'pg_dump --clean --if-exists -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
 ```
 
-恢复（建议先在测试实例验证）：
+恢复（--clean 产物会先删除同名对象再重建；仍建议优先在测试环境演练）：
 
 ```bash
 cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'psql -U "$POSTGRES_USER" "$POSTGRES_DB"'
+  sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" "$POSTGRES_DB"'
 ```
 
 备份文件含用户需求数据，应限制访问权限并避免提交Git。
@@ -1254,8 +1283,8 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 
 - 主键使用UUID字符串。
 - 时间使用ISO 8601 UTC格式。
-- 成功响应统一采用资源直返：单个资源返回资源对象；列表返回`{ "items": [], "total": 0, "page": 1, "page_size": 20 }`；无内容操作返回HTTP 204。不得在部分接口额外包裹`data`。
-- 错误响应统一采用`{"error":{"code":"...","message":"...","request_id":"..."}}`。
+- 成功响应统一采用资源直返：单个资源返回资源对象（运行记录类单资源可内嵌`items`子资源数组，属内嵌明细而非分页信封，见§5生成接口）；列表返回`{ "items": [], "total": 0, "page": 1, "page_size": 20 }`；无内容操作返回HTTP 204。不得在部分接口额外包裹`data`。
+- 错误响应统一采用`{"error":{"code":"...","message":"...","request_id":"...","details":[...]}}`；`details`为可选字符串数组，承载可供用户定位问题的业务细节，无细节时省略该字段。AI相关`code`取值见§8错误码映射表。
 - 列表接口支持`page`和`page_size`，默认20，最大100。
 - 请求体由Pydantic校验；未知字段默认拒绝或明确忽略，团队需统一配置。
 
@@ -1290,10 +1319,12 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 | GET | `/projects/{project_id}/analysis-runs` | 查询分析历史 |
 | GET | `/analysis-runs/{run_id}` | 获取分析运行详情 |
 | GET | `/projects/{project_id}/requirements` | 获取需求列表 |
-| PATCH | `/requirements/{requirement_id}` | 修改需求 |
-| POST | `/requirements/{requirement_id}/confirm` | 确认需求 |
+| PATCH | `/requirements/{requirement_id}` | 修改需求；编辑CONFIRMED需求后状态自动回到DRAFT |
+| POST | `/requirements/{requirement_id}/confirm` | 确认需求；对已CONFIRMED需求重复调用为幂等成功（200） |
 | PATCH | `/clarification-questions/{question_id}` | 回答或忽略问题；回答只更新问题记录，不自动改写需求 |
-| PATCH | `/acceptance-criteria/{criterion_id}` | 修改验收标准 |
+| PATCH | `/acceptance-criteria/{criterion_id}` | 修改验收标准；对CONFIRMED需求的验收标准执行编辑后，该需求状态同样回到DRAFT |
+
+需求编辑与确认状态语义：`status`仅有DRAFT和CONFIRMED两种。对CONFIRMED需求执行PATCH编辑后，状态自动回到DRAFT，需重新确认；PATCH响应返回更新后的需求对象，其中`status`为`DRAFT`。对CONFIRMED需求的验收标准执行PATCH编辑，同样使该需求状态回到DRAFT（与需求编辑对称）。对已CONFIRMED需求重复调用confirm为幂等成功：返回200，状态保持CONFIRMED不变，不报错。需求由CONFIRMED回到DRAFT后，其已生成的测试用例保留——仍可查看、编辑、导出，不自动删除；重新确认并再次生成用例时，该需求名下旧用例在生成事务内被新用例替换（见§5）。
 
 触发分析请求：
 
@@ -1301,17 +1332,24 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 {"source_text":"用户可以使用手机号注册账号，并通过手机号和密码登录。忘记密码后可以重新设置密码。"}
 ```
 
-成功响应关键结构：
+成功返回HTTP 201，响应体为本次分析运行对象（与`GET /analysis-runs/{run_id}`返回同一AnalysisRun结构，见§7），关键结构如下：
 
 ```json
 {
-  "run_id":"<uuid>",
+  "id":"<uuid>",
   "status":"SUCCEEDED",
   "summary":"...",
   "requirements":[{"id":"<uuid>","requirement_code":"REQ-001","title":"手机号注册","status":"DRAFT"}],
   "questions":[{"id":"<uuid>","question":"注册是否需要验证码？","reason":"原文未说明手机号格式、验证方式和账号唯一性规则","status":"OPEN","answer":null}]
 }
 ```
+
+分析运行获取契约：
+
+- `GET /projects/{project_id}/analysis-runs`：分页列表（结构见§1），`items`元素为运行摘要对象，字段`id, status, provider, model, prompt_version, requirements_count, questions_count, open_questions_count, error_code, created_at, finished_at`，按`created_at`倒序排列。
+- `GET /analysis-runs/{run_id}`：单资源直返（无分页包裹），返回§7 AnalysisRun完整对象——在摘要对象字段基础上增加`project_id`、`error_message`、`latency_ms`、`input_tokens`、`output_tokens`，以及`source_text`（本次原始输入）、`summary`（分析摘要）、`requirements`（该次运行产出的需求摘要数组，元素含`id, requirement_code, title, status`）与`questions`（数组，元素为ClarificationQuestion结构，见§7）。`questions`与`requirements`反映数据库最新状态（含用户后续的回答与需求编辑），不是分析完成时`result_json`的快照。
+
+页面C刷新后对未处理问题的持续提醒（`docs/05-prd.md`§8业务规则第6条）以列表中的`open_questions_count`与详情中的`questions`数组为数据来源。完整数据模型见§7 AnalysisRun。
 
 问题答复请求示例：
 
@@ -1328,7 +1366,6 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 | POST | `/projects/{project_id}/test-generation-runs` | 基于已确认需求生成用例 |
 | GET | `/projects/{project_id}/test-cases` | 查询用例列表 |
 | PATCH | `/test-cases/{test_case_id}` | 编辑用例 |
-| DELETE | `/test-cases/{test_case_id}` | 删除用例 |
 
 生成请求：
 
@@ -1336,14 +1373,37 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 {"requirement_ids":["<confirmed-requirement-uuid>"]}
 ```
 
-若没有已确认需求，或所选需求ID不属于当前项目/状态不为CONFIRMED，预检阶段返回422和`NO_CONFIRMED_REQUIREMENTS`，不调用模型、不创建生成运行记录。通过预检后先创建`RUNNING`的`test_generation_runs`记录。若模型判断任何一条所选需求仍缺少明确预期结果所需的信息，返回422和`INSUFFICIENT_REQUIREMENT_DETAIL`，将该运行记录置为`FAILED`并保存脱敏错误；本次生成全量失败且不保存部分用例。模型调用/结构校验失败同样将运行记录置为`FAILED`；成功时在同一事务中保存全部用例并将运行记录置为`SUCCEEDED`。
+预检拒绝情形恰为三种——没有已确认需求／所选需求ID不属于当前项目／所选需求ID状态不为CONFIRMED——均返回422和`NO_CONFIRMED_REQUIREMENTS`，不调用模型、不创建生成运行记录；任一情形命中即整体拒绝，不得静默过滤未确认或不属于本项目的ID后继续生成。通过预检后先创建`RUNNING`的`test_generation_runs`记录。后端检测到模型输出的信息不足信号（`error.code=INSUFFICIENT_REQUIREMENT_DETAIL`，与`test_cases`互斥，模型侧输出契约见`docs/06-ai-design.md`§4.2）后，返回422和`INSUFFICIENT_REQUIREMENT_DETAIL`，将该运行记录置为`FAILED`并保存脱敏错误，同时将模型信号`details`中的需求临时ID（如R1/R2）映射为对应需求的`requirement_code`与缺失信息摘要后放入响应`error.details`数组（见§1），用户可据此定位需补充的需求；本次生成全量失败且不保存任何部分用例。模型调用/结构校验失败同样将运行记录置为`FAILED`；各失败情形均不删除既有旧用例。成功时在同一事务内先删除所选需求名下的既有旧用例，再写入本次生成的全部新用例，并将运行记录置为`SUCCEEDED`——按需求替换，本次未选中的需求其用例不受影响（需求被编辑回DRAFT后其既有用例保留，直至重新确认并再次生成时被替换，见§4）。
+
+生成接口为同步接口：成功返回HTTP 201，响应体为本次运行记录对象（`status=SUCCEEDED`，含`provider`、`model`、`prompt_version`等），并内嵌`items`数组，即本次生成并已保存的测试用例，元素与§7 TestCase结构一致；失败按§8错误码映射表返回，不含`items`。成功响应示例：
+
+```json
+{
+  "id": "<run-uuid>",
+  "project_id": "<project-uuid>",
+  "status": "SUCCEEDED",
+  "provider": "...",
+  "model": "...",
+  "prompt_version": "...",
+  "source_requirement_ids": ["<requirement-uuid>"],
+  "error_code": null,
+  "latency_ms": 8600,
+  "input_tokens": 900,
+  "output_tokens": 1600,
+  "created_at": "2026-11-11T08:00:00Z",
+  "finished_at": "2026-11-11T08:00:09Z",
+  "items": [
+    {"id":"<uuid>","requirement_id":"<requirement-uuid>","case_code":"CASE-001","title":"使用未注册的11位手机号完成注册","test_type":"positive","priority":"high","preconditions":["手机号为11位数字","该手机号尚未注册"],"steps":["打开注册页面","输入11位未注册手机号","提交注册"],"expected_result":"系统创建账号并显示注册成功提示。"}
+  ]
+}
+```
 
 ## 6. 导出接口
 
 | 方法 | 路径 | Content-Type | 文件 |
 |---|---|---|---|
 | GET | `/projects/{project_id}/exports/requirements.md` | `text/markdown; charset=utf-8` | 需求文档 |
-| GET | `/projects/{project_id}/exports/test-cases.csv` | `text/csv; charset=utf-8` | 测试用例表 |
+| GET | `/projects/{project_id}/exports/test-cases.csv` | `text/csv; charset=utf-8` | 测试用例表；导出编码定死为UTF-8 with BOM，保证Excel直接打开中文不乱码 |
 
 ## 7. 主要数据模型
 
@@ -1351,9 +1411,23 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 
 `id, project_id, requirement_code, title, description, requirement_type, priority, status, source_excerpt, acceptance_criteria[]`
 
+`acceptance_criteria[]`元素含`id, criterion_text, sort_order`，与数据库`acceptance_criteria`表列对齐；AI输出侧的`acceptance_criteria`元素结构与`sort_order`映射规则见`docs/06-ai-design.md`§4.1。`status`取值DRAFT/CONFIRMED，编辑与确认的状态语义见§4。
+
 ### ClarificationQuestion
 
 `id, question, reason, status, answer`
+
+### AnalysisRun
+
+`id, project_id, status, provider, model, prompt_version, source_text, summary, error_code, error_message, latency_ms, input_tokens, output_tokens, requirements_count, questions_count, open_questions_count, created_at, finished_at, requirements[], questions[]`
+
+与数据库`analysis_runs`表对应（`result_json`仅供后端内部使用，不直接对外暴露；`summary`由后端从`result_json`投影对外返回）；`status`取值RUNNING/SUCCEEDED/FAILED，`error_code`取值见§8映射表。`requirements_count`、`questions_count`、`open_questions_count`为服务端按数据库最新数据计算的派生字段（`open_questions_count`为状态OPEN的问题数）。`requirements[]`为该次运行产出需求的摘要数组（`id, requirement_code, title, status`），`questions[]`为ClarificationQuestion数组；两者均反映数据库最新状态而非`result_json`快照。列表接口返回运行摘要对象、单资源接口直返完整对象，契约见§4。
+
+### TestGenerationRun
+
+`id, project_id, status, provider, model, prompt_version, source_requirement_ids[], error_code, error_message, latency_ms, input_tokens, output_tokens, created_at, finished_at`
+
+与数据库`test_generation_runs`表对应（`result_json`仅供后端内部使用）；字段语义与AnalysisRun一致。生成成功响应（见§5）内嵌的`items`用例数组即校验后`result_json`的对外投影。`status`取值RUNNING/SUCCEEDED/FAILED，`error_code`取值见§8映射表。
 
 ### TestCase
 
@@ -1361,14 +1435,31 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 
 ## 8. 同步调用与超时
 
-MVP不引入后台任务队列。AI请求由API同步等待，前端显示加载状态并禁用重复点击；模型单次HTTP请求超时默认60秒，最多允许一次受控重试；Nginx读取超时设置为150秒，为两次调用及有限退避预留时间；前端AI请求超时建议设置为160秒，普通CRUD请求可使用较短超时。若调整重试次数或单次超时，必须同步调整Nginx与前端超时设置。调用前创建RUNNING运行记录，调用完成后更新为SUCCEEDED或FAILED。若实际服务时延经测试经常超过该值，再评估异步任务，不在首版提前引入Redis/Celery。
+MVP不引入后台任务队列。AI请求由API同步等待，前端显示加载状态并禁用重复点击；模型单次HTTP请求超时默认60秒；单次API请求内模型调用总计最多2次（首次调用+1次重试），`AI_MAX_RETRIES=1`为5xx网络退避重试与JSON结构修复重试的合并预算——任一先发生即消耗唯一重试机会，不叠加；Nginx读取超时设置为150秒，为两次调用及有限退避预留时间；前端AI请求超时建议设置为160秒，普通CRUD请求可使用较短超时。若调整重试次数或单次超时，必须同步调整Nginx与前端超时设置。调用前创建RUNNING运行记录，调用完成后更新为SUCCEEDED或FAILED。若实际服务时延经测试经常超过该值，再评估异步任务，不在首版提前引入Redis/Celery。
+
+**AI错误码映射表**（与`docs/06-ai-design.md`§8异常处理表保持一致）：
+
+| 场景 | HTTP状态码 | `error_code` |
+|---|---|---|
+| 未配置AI仍调用 | 503 | `AI_NOT_CONFIGURED` |
+| 网络/DNS失败 | 502 | `AI_PROVIDER_UNREACHABLE` |
+| 上游返回401/403 | 502 | `AI_PROVIDER_AUTH_FAILED` |
+| 上游返回429 | 429 | `AI_RATE_LIMITED` |
+| 上游5xx（重试后仍失败） | 502 | `AI_PROVIDER_ERROR` |
+| 请求超时 | 504 | `AI_PROVIDER_TIMEOUT` |
+| JSON无效/输出截断（修复重试后仍失败） | 502 | `AI_INVALID_OUTPUT` |
+| 生成输入超限 | 422 | `INPUT_TOO_LARGE`（预检拒绝，不创建运行记录；分析文本超长同码预检拒绝） |
+| 预检失败：没有已确认需求／所选需求ID不属于当前项目／所选需求ID状态不为CONFIRMED | 422 | `NO_CONFIRMED_REQUIREMENTS`（不调用模型、不创建运行记录，见§5） |
+| 模型输出信息不足信号 | 422 | `INSUFFICIENT_REQUIREMENT_DETAIL`（运行记录置为FAILED，见§5） |
+
+数据库两类运行记录表（`analysis_runs`/`test_generation_runs`）的`error_code`列（VARCHAR(80)）取值即本表；运行记录状态为FAILED时写入对应错误码。
 
 ## 9. 幂等与并发
 
 - 前端在请求中禁用重复提交。
 - 生成接口可接收可选`Idempotency-Key`；如实现成本过高，至少以请求状态和按钮禁用避免双击。
 - 更新接口使用`updated_at`或版本字段防止静默覆盖；MVP可先采用最后写入生效，并在UI提示保存成功。
-- 生成用例时校验所有需求ID存在、属于当前项目且为CONFIRMED。
+- 生成用例时校验所有需求ID存在、属于当前项目且为CONFIRMED；任一不满足即整体拒绝（422 `NO_CONFIRMED_REQUIREMENTS`，见§5预检），不静默过滤后继续生成。
 
 ## 10. 配置与字段映射约定
 
@@ -1408,7 +1499,7 @@ ReqFlow AI
 │       ├── 待确认问题
 │       ├── 验收标准
 │       └── 测试用例
-└── 关于/部署配置提示
+└── 设置/模型配置说明页
 ```
 
 ## 3. 页面定义
@@ -1428,17 +1519,22 @@ ReqFlow AI
 ### 页面C：项目工作区
 
 推荐使用页签或侧边导航：
-1. 需求分析：原始输入、加载示例需求按钮、分析按钮、AI运行状态；示例只填充输入框，用户可清空，未提交前不写数据库。
-2. 需求条目：标题、描述、类型、优先级、状态、来源摘录。
+1. 需求分析：原始输入、需求输入区敏感信息警示文案（请勿粘贴密码、个人身份证件、生产密钥或未授权数据，对应docs/06 §10）、加载示例需求按钮、分析按钮、AI运行状态；示例只填充输入框，用户可清空，未提交前不写数据库；分析完成后在结果区顶部展示AI生成的需求摘要（对应FR-005与用户手册docs/13 §3）。
+2. 需求条目：业务编号`requirement_code`（如`REQ-001`，与导出文件中的业务编号一致）、标题、描述、类型、优先级、状态、来源摘录。
 3. 待确认问题：问题、原因、回答输入框、已解决/忽略操作；问题属于分析运行级别；回答只保存问题记录，不会自动回写需求/标准或重新调用AI，需由用户手动编辑相关需求/标准。需求确认不会自动关闭问题。
-4. 验收标准：按需求分组显示，支持编辑。
-5. 测试用例：生成入口、用例列表和编辑面板。
+4. 验收标准：按需求分组显示，支持编辑；编辑已确认（CONFIRMED）需求的验收标准会使所属需求状态回到草稿（DRAFT），需重新确认后才能用于生成用例（与需求编辑联动一致）；已生成的用例不自动删除，仍可查看、编辑和导出。
+5. 测试用例：生成入口、用例列表和编辑面板；生成入口需提示：重新生成会在同一生成事务内替换所选需求下的旧用例，生成失败时旧用例保留。
 
 ### 页面D：测试用例
 
 表格列：业务用例编号（如`CASE-001`）、标题、来源需求、类型、优先级、操作。MVP不提供独立的用例审核状态流转。
 编辑区字段：前置条件、步骤列表、预期结果、优先级。
 导出：CSV按钮；需求导出在需求页提供Markdown按钮。
+
+### 页面E：设置/模型配置说明页
+
+- 展示当前模型配置来源与部署提示，只读页面；与PRD页面清单第5项命名一致。
+- 不展示API Key等密钥值；部署级配置由环境变量控制，如需修改按部署手册更新`deploy/.env`后重启。
 
 ## 4. 交互状态
 
@@ -1467,7 +1563,8 @@ ReqFlow AI
 - 表单控件有可见标签和错误提示。
 - 键盘可完成核心操作。
 - 重要状态不只依赖颜色。
-- 大段需求输入框支持清晰字符上限提示。
+- 大段需求输入框支持清晰字符上限提示：上限默认12000字符（后端`AI_MAX_INPUT_CHARS`配置），前端按该默认值提示，最终以后端校验为准。
+- 需求输入区持续显示敏感信息警示文案（请勿粘贴密码、个人身份证件、生产密钥或未授权数据）。
 - 文本、表格在常见桌面分辨率下不横向溢出。
 
 ## 7. UI验收
@@ -1497,7 +1594,7 @@ ReqFlow AI
 - Docker Engine + Docker Compose v2。
 - PostgreSQL 17容器；测试数据库与开发数据库隔离。
 - Chrome/Edge桌面浏览器。
-- 后端pytest；前端测试框架由Day 6技术验证确定。
+- 后端pytest；前端测试框架由 Day 7 技术验证确定（候选 Vitest，见 docs/04 Day 7）。
 - AI测试使用受控API Key和固定测试样本；记录供应商、模型、Prompt版本和日期。
 - CI可使用PostgreSQL服务容器；不允许用SQLite替代数据库集成测试。
 
@@ -1550,8 +1647,8 @@ ReqFlow AI
 | TC-015 | FR-010 | 有已确认需求、AI配置有效 | 触发用例生成 | 真实模型返回用例，关联需求正确 | P0 |
 | TC-016 | FR-011 | 存在用例 | 编辑步骤和预期结果 | 保存后刷新数据不丢失 | P0 |
 | TC-017 | FR-012 | 项目存在需求 | 导出Markdown | UTF-8文件可打开，需求/标准齐全 | P0 |
-| TC-018 | FR-013 | 项目存在用例 | 导出CSV | 列头稳定、逗号/换行转义正确 | P0 |
-| TC-019 | NFR-002 | 系统已保存数据 | `docker compose down`后重新up | 项目和用例仍存在 | P0 |
+| TC-018 | FR-013 | 项目存在用例 | 导出CSV | 文件以UTF-8 BOM开头；列头稳定、逗号/换行转义正确；Excel直接打开中文不乱码 | P0 |
+| TC-019 | NFR-002 | 系统已保存数据 | `docker compose down`（完整命令形态见docs/12 §5）后重新up | 项目和用例仍存在 | P0 |
 | TC-020 | NFR-002 | 系统已保存数据 | 重建web/backend容器 | 数据库数据仍存在 | P0 |
 | TC-021 | NFR-001 | 干净Docker环境 | 按部署手册从零启动 | 三服务健康，页面可访问 | P0 |
 | TC-022 | NFR-009 | 存在备份 | 备份后恢复到测试实例 | 恢复数据可查询 | P0 |
@@ -1565,10 +1662,12 @@ ReqFlow AI
 | TC-027 | NFR-005 | 项目存在 | 提交12001字符需求文本 | 前后端拒绝，明确提示，不调用模型 | P0 |
 | TC-028 | NFR-007 | Windows/macOS任一测试环境 | 在当前稳定版Chrome和Edge桌面端分别完成核心流程冒烟 | 项目创建、分析结果展示、用例编辑和下载均无阻断问题；记录版本 | P0 |
 | TC-029 | NFR-008 | 已成功完成分析和用例生成 | 检查运行记录与用例数据 | 记录provider/model/prompt_version；每条用例保存来源requirement_id；导出业务编号与页面一致 | P0 |
-| TC-030 | NFR-010 | 固定测试主机、PostgreSQL和无外部AI依赖 | 对项目列表/详情等非AI接口各预热5次后测量100次 | 记录环境、样本、P50/P95；本地演示环境目标P95<500ms；未达标需如实记录，不可伪称通过 | P1 |
-| TC-031 | FR-008 | 项目存在已保存的验收标准 | 修改一条验收标准并刷新页面 | 标准文本更新保留，仍关联原需求 | P0 |
+| TC-030 | NFR-010 | 固定测试主机、PostgreSQL和无外部AI依赖 | 对项目列表/详情等非AI接口各预热5次后测量100次 | 记录环境、样本、P50/P95；本地演示环境目标P95<500ms；未达标需如实记录，不可伪称通过 | P0 |
+| TC-031 | FR-008 | 项目存在已保存的验收标准，所属需求为CONFIRMED | 修改一条验收标准并刷新页面 | 标准文本更新保留，仍关联原需求；所属需求状态回到DRAFT，需重新确认后方可用于生成 | P0 |
 | TC-032 | FR-010 | 选择的已确认需求中至少有一条缺少生成明确预期结果的必要信息 | 请求生成测试用例 | 返回422 `INSUFFICIENT_REQUIREMENT_DETAIL`；生成运行记录置为FAILED；本次请求不保存任何部分用例；用户可补充需求后重试 | P0 |
 | TC-033 | FR-010 | 测试用例生成模型调用超时或返回非法结构 | 请求生成测试用例 | 运行记录最终为FAILED并保存脱敏错误码/信息；不保存任何测试用例；已存在的用例不受影响 | P0 |
+| TC-034 | FR-002 | 已创建的项目数量超过一页（默认page_size=20） | 项目列表翻页至第2页 | 响应items/total/page/page_size正确；第2页数据正确且与第1页不重复 | P0 |
+| TC-035 | FR-006/FR-010 | 需求已CONFIRMED且已生成测试用例 | 需求编辑状态联动与用例替换：编辑该需求→重新确认→再次生成用例 | 编辑后需求状态回到DRAFT，旧用例仍可查看和导出；再次生成后该需求的旧用例被新用例替换，其他需求的用例不受影响 | P0 |
 
 ## 7. AI测试样本集建议
 
@@ -1604,18 +1703,21 @@ ReqFlow AI
 
 使用`templates/test-report-template.md`。至少记录版本、环境、用例总数、通过/失败/阻塞数量、缺陷列表、AI样本评分、部署测试和未解决风险。
 
+TC-025~TC-035等用例的执行记录可使用`templates/test-case-template.md`作为载体，逐条填写实际结果、状态和证据（呼应AUDIT_REPORT OPEN-07）。
+
 ### 非功能需求检查补充
 
 - NFR-006可维护性通过代码审查清单检查模块边界、类型、迁移和日志，不以单一功能测试替代。
 - NFR-004安全通过TC-023/024及发布前密钥扫描检查。
 - NFR-001/002/003/005/007/008/009分别由TC-021/019-020/026/027/028/029/022覆盖。
 - NFR-010为本地环境目标，由TC-030实测；该指标不代表外部模型API时延。
+- NFR-011健康检查由TC-021部署测试验证db/backend/web三级健康状态（端点与判定见docs/07、docs/12）。
 
 ## 11. 最终验收标准
 
 - P0测试用例全部通过。
 - P0缺陷清零。
-- AI真实调用证据齐备，模拟模式明确区分。
+- AI真实调用证据齐备；演示/测试夹具数据明确标记，不冒充真实模型输出。
 - PostgreSQL迁移、数据持久化、备份恢复验证通过。
 - Docker Compose干净部署可复现。
 - 七类交付物有实际文件或发布证据。
@@ -1656,6 +1758,7 @@ ReqFlow AI
 - `backend/Dockerfile`的工作目录必须固定为`/app`，并把后端代码、`alembic/`、`alembic.ini`和锁定的Python依赖安装到镜像中，保证Compose命令`alembic upgrade head && uvicorn app.main:app ...`在该目录可执行。
 - `frontend/Dockerfile`采用多阶段构建：Node构建Vue静态资源，Nginx镜像负责运行；从仓库根构建上下文复制`deploy/nginx.conf`到`/etc/nginx/conf.d/default.conf`。
 - 若Web健康检查使用`wget`，最终Nginx镜像必须提供该命令；否则Dockerfile需安装探针依赖或将健康检查调整为镜像内确实存在的命令。
+- 构建上下文为仓库根；`.dockerignore`已排除`.git`、`deploy/.env`、`artifacts/`、`docs/`、`templates/`，防止真实密钥进入镜像构建上下文。
 - 两个Dockerfile不得依赖宿主机预装Node.js、Python或PostgreSQL。
 
 ## 5. 启动
@@ -1710,14 +1813,14 @@ docker compose --env-file deploy/.env -f deploy/docker-compose.yml up -d --build
 
 ```bash
 docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'pg_dump -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
+  sh -c 'pg_dump --clean --if-exists -U "$POSTGRES_USER" "$POSTGRES_DB"' > backup.sql
 ```
 
-恢复（先备份当前库，并优先在测试环境演练）：
+恢复（先备份当前库。--clean 产物会先删除同名对象再重建；仍建议优先在测试环境演练）：
 
 ```bash
 cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.yml exec -T db \
-  sh -c 'psql -U "$POSTGRES_USER" "$POSTGRES_DB"'
+  sh -c 'psql -v ON_ERROR_STOP=1 -U "$POSTGRES_USER" "$POSTGRES_DB"'
 ```
 
 ## 9. 常见问题
@@ -1742,6 +1845,8 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 ## 11. 干净环境部署验收
 
 使用未安装Python/Node/PostgreSQL的测试主机或干净虚拟机：
+
+本清单第4、5、8步中的compose命令均按§5完整形式执行（`docker compose --env-file deploy/.env -f deploy/docker-compose.yml …`）。
 
 1. 安装Docker和Compose v2。
 2. 克隆实际仓库。
@@ -1768,7 +1873,7 @@ cat backup.sql | docker compose --env-file deploy/.env -f deploy/docker-compose.
 
 ## 2. 创建项目
 
-填写项目名称（必填）和描述（选填），点击保存。成功后进入项目工作区。建议一个实际产品或课程设计对应一个项目。
+填写项目名称（必填）和描述（选填），点击保存。成功后进入项目工作区。建议一个实际产品或课程设计对应一个项目。在项目列表或工作区可再次编辑项目名称和描述并保存（FR-003）。
 
 ## 3. 输入需求并分析
 
@@ -1778,16 +1883,16 @@ AI输出仅是草稿，必须检查其是否忠实于原始需求。MVP不会把
 
 ## 4. 修改和确认需求
 
-逐条检查需求的标题、描述、类型、优先级和来源摘录；对待确认问题填写答案或标记忽略；调整验收标准。回答问题只保存到问题记录，不会自动回写需求/标准，也不会自动重新调用AI。用户需手动将答案补充到相关需求描述或验收标准并保存。澄清问题属于分析运行级别，仍为OPEN的问题会持续显示提醒；用户可在检查具体需求后明确点击确认，但确认需求不会自动关闭问题。只有经过用户检查并点击确认的需求，才进入默认测试用例生成范围。
+逐条检查需求的标题、描述、类型、优先级和来源摘录；对待确认问题填写答案或标记忽略；调整验收标准。回答问题只保存到问题记录，不会自动回写需求/标准，也不会自动重新调用AI。用户需手动将答案补充到相关需求描述或验收标准并保存。澄清问题属于分析运行级别，仍为OPEN的问题会持续显示提醒；用户可在检查具体需求后明确点击确认，但确认需求不会自动关闭问题。只有经过用户检查并点击确认的需求，才进入默认测试用例生成范围。编辑已确认的需求或其验收标准会使该需求回到草稿状态，需重新确认后才能用于生成；已生成的旧用例不会自动删除，仍可查看、编辑和导出。
 
 ## 5. 生成测试用例
 
-进入“测试用例”区域，选择已确认需求，点击生成。系统生成用例标题、类型、优先级、前置条件、步骤和预期结果，并显示来源需求。检查是否有遗漏或模型臆造内容，必要时编辑后保存。若所选需求仍缺少明确预期结果所需的信息，系统会拒绝本次生成且不保存部分用例；请先补充需求/验收标准，再确认并重试。
+进入“测试用例”区域，选择已确认需求，点击生成。系统生成用例标题、类型、优先级、前置条件、步骤和预期结果，并显示来源需求。检查是否有遗漏或模型臆造内容，必要时编辑后保存。对已有用例的需求重新生成时，会整体替换所选需求下的旧用例；生成失败时旧用例保留，不受影响。若所选需求仍缺少明确预期结果所需的信息，系统会拒绝本次生成且不保存部分用例；请先补充需求/验收标准，再确认并重试。
 
 ## 6. 导出
 
 - 需求页：导出Markdown需求文档。
-- 测试用例页：导出CSV，可使用Excel、Numbers或LibreOffice打开。
+- 测试用例页：导出CSV，可使用Excel、Numbers或LibreOffice打开；CSV为UTF-8 with BOM编码，Excel直接打开中文不乱码。
 
 导出前确认页面数据已保存。
 
@@ -1797,7 +1902,7 @@ AI输出仅是草稿，必须检查其是否忠实于原始需求。MVP不会把
 
 ## 8. 删除项目
 
-删除前请导出需要保留的资料。删除项目会同时删除关联需求、问题、验收标准、分析记录和测试用例，且不可直接撤销。
+删除前请导出需要保留的资料。删除项目会同时删除关联需求、问题、验收标准、分析记录、用例生成记录和测试用例，且不可直接撤销。
 
 ## 9. 使用边界
 
@@ -1807,13 +1912,15 @@ ReqFlow AI是辅助工具，不保证自动生成内容完全正确。正式开�
 
 # 14 软件维护说明书
 
+> 本手册描述计划交付的运维方案。当前规划文档包尚不包含`frontend/`、`backend/`源码及两个Dockerfile，所述功能与维护流程尚未实现；实现后须按实际命令与验证记录校准，不得将文档/配置文件存在视为维护流程已验证。
+
 ## 1. 维护目标
 
 保障自托管MVP可启动、数据可恢复、AI配置可调整、依赖可更新，并确保代码、数据库迁移和工程文档一致。
 
 ## 2. 日常维护
 
-- 定期查看`docker compose ps`和服务日志。
+- 定期查看`docker compose --env-file deploy/.env -f deploy/docker-compose.yml ps`和服务日志。
 - 检查磁盘空间、PostgreSQL卷容量和备份文件。
 - 不在日志中记录API Key或敏感输入。
 - 重要更新前进行数据库备份。
@@ -1825,9 +1932,9 @@ ReqFlow AI是辅助工具，不保证自动生成内容完全正确。正式开�
 2. 停止非必要写入并备份数据库。
 3. 拉取新版本或Release。
 4. 检查`.env`新增/变更项。
-5. 执行Compose构建和启动，后端运行Alembic迁移。
+5. 执行Compose构建和启动，后端运行Alembic迁移。若仅backend镜像更新，升级后应同时重启web服务（或执行`nginx -s reload`），以刷新Nginx对上游容器地址的解析（静态proxy_pass仅在配置加载时解析）。
 6. 验证健康检查、项目读取、AI调用、导出和数据完整性。
-7. 若升级失败，保留日志和备份；按迁移兼容性计划回滚代码并恢复数据。
+7. 若升级失败，保留日志和备份；按迁移兼容性计划回滚代码，并按部署手册§8的恢复命令恢复数据（`pg_dump --clean --if-exists`产物会先删除同名对象再重建；仍建议优先在测试环境演练，恢复使用`psql -v ON_ERROR_STOP=1`）。
 
 ## 4. 数据维护
 
@@ -1846,7 +1953,7 @@ ReqFlow AI是辅助工具，不保证自动生成内容完全正确。正式开�
 
 ## 6. 故障排查顺序
 
-1. `docker compose ps`确认容器状态。
+1. `docker compose --env-file deploy/.env -f deploy/docker-compose.yml ps`确认容器状态。
 2. 查看web/backend/db日志。
 3. 检查数据库健康与连接配置。
 4. 检查Alembic迁移版本。
@@ -1886,10 +1993,12 @@ MVP没有账号认证和多租户隔离，不适合直接作为公网多用户�
 - CONTRIBUTING.md：贡献流程。
 - CODE_OF_CONDUCT.md：协作行为准则。
 - CHANGELOG.md：版本变更。
+- THIRD-PARTY-NOTICES.md：第三方依赖许可证清单，Release前按Day 2-7锁定的版本复核更新。
 - .gitignore：排除密钥、构建产物、数据库备份。
+- .dockerignore：Docker构建上下文排除规则（与.gitignore防护面对齐，排除*.sql、*.dump、*.log、backups/等）。
 - docs/：工程文档。
 - frontend/、backend/、tests/、deploy/：源代码、测试和部署。
-- `.env.example`：仅包含配置键和安全占位值。
+- `deploy/.env.example`：仅包含配置键和安全占位值。
 
 ## 4. 发布步骤
 
@@ -1899,7 +2008,7 @@ MVP没有账号认证和多租户隔离，不适合直接作为公网多用户�
 4. 执行测试和安全检查，记录版本号、Commit SHA和测试报告。
 5. 创建Release候选版并由两人复核。
 6. 核心验收通过后打`v1.0.0`标签并发布Release。
-7. 发布截图、操作视频、文档链接和问题反馈渠道。
+7. 发布截图、操作视频、文档链接和问题反馈渠道；`ReqFlow_AI_项目汇报.pptx`与`ReqFlow_AI_系统操作演示.mp4`以Release附件发布。
 8. 后续Issue按Bug/Feature/Docs分类维护。
 
 ## 5. README必须展示
@@ -1909,8 +2018,10 @@ MVP没有账号认证和多租户隔离，不适合直接作为公网多用户�
 ## 6. 发布前检查
 
 - [ ] 公开仓库真实可访问。
-- [ ] LICENSE版权主体已确认。
+- [ ] LICENSE 版权主体已替换为真实团队信息、正文仅含标准 MIT 文本（无占位符、无批注）。
 - [ ] 依赖许可证已检查。
+- [ ] CODE_OF_CONDUCT联系渠道已补充为真实有效方式。
+- [ ] THIRD-PARTY-NOTICES.md已按锁定版本复核并随仓库发布。
 - [ ] 无真实API Key、密码、日志和用户数据。
 - [ ] 默认部署不会意外暴露数据库端口。
 - [ ] 未实现功能未标记为已完成。
@@ -1946,7 +2057,7 @@ MVP没有账号认证和多租户隔离，不适合直接作为公网多用户�
 
 ## 汇报建议
 
-- 控制在8-10分钟；每页30-50秒，核心演示可占2-3分钟。
+- 总时长控制在12分钟以内：每页25-40秒（14页合计约5分50秒至9分20秒），核心演示可占2-2.5分钟；按上限计算9分20秒+2分30秒=11分50秒，仍在12分钟以内，按下限计算约7分50秒。
 - 尽量使用真实系统截图，不用纯文字堆叠。
 - 关键指标只展示实际测量值；没有数据时明确写“未测量/暂不结论”。
 - 说明AI服务调用需要外部模型配置，不将模型能力描述成自研大模型。
@@ -1954,6 +2065,8 @@ MVP没有账号认证和多租户隔离，不适合直接作为公网多用户�
 ---
 
 # 17 系统操作视频脚本
+
+> 本脚本描述计划实现的功能，录制安排在开发完成之后；正式录制前须根据实际页面、按钮名称和操作结果校准画面与旁白，不得宣称未实现功能。
 
 **建议时长：** 4-6分钟  
 **分辨率：** 1920×1080，16:9，30fps  
@@ -2056,24 +2169,24 @@ MVP没有账号认证和多租户隔离，不适合直接作为公网多用户�
 
 # 19 项目风险登记册
 
-概率/影响：高/中/低；风险等级由团队在每日同步中更新。
+概率/影响/等级：高/中/低；等级按概率×影响综合判定（概率与影响均为高、或一高一中时为高；均为中、或一高一低时为中；其余为低）。等级与状态在每日同步会更新，更新时同步修改更新日期列。
 
-| ID | 风险描述 | 概率 | 影响 | 预警信号 | 应对策略 | 负责人 |
-|---|---|---|---|---|---|---|
-| R-01 | 模型API不可用或Key无效 | 中 | 高 | Day 2无法完成真实调用 | Day 2做Spike；准备一个备用服务商；统一适配层 | B |
-| R-02 | AI输出格式不稳定 | 高 | 高 | Schema解析失败率上升 | JSON Schema/Pydantic校验、一次修复重试、固定样本集 | B |
-| R-03 | AI擅自补充未给出的规则 | 中 | 高 | 输出出现原文没有的确定规则 | Prompt只提取原文事实，缺失条件输出为澄清问题；禁止模型推测写入需求/标准；用户手动补充答案并确认；进行事实忠实度评测 | A+B |
-| R-04 | 功能范围蔓延 | 高 | 高 | 不断提出账号、协作、RAG等需求 | P0/P1边界；Day20冻结；新增需求必须交换范围 | A |
-| R-05 | 前后端契约不一致 | 中 | 中 | 联调时字段频繁变更 | Day6冻结API Schema；PR更新契约 | A+B |
-| R-06 | PostgreSQL迁移或卷配置错误 | 中 | 高 | 容器重启丢数据/迁移失败 | Day7验证健康检查；集成测试用PG；备份恢复 | B |
-| R-07 | Docker在干净环境无法部署 | 中 | 高 | 本机可运行但干净机器失败 | Day25前完成干净环境验证；固定镜像标签 | B |
-| R-08 | 密钥误提交或日志泄露 | 中 | 高 | Git扫描发现Key | `.env`忽略、密钥扫描、演示脱敏、立即轮换 | B |
-| R-09 | 两人工作量分配不均 | 中 | 中 | 某模块长期阻塞 | 每日同步；任务WIP限制；共同处理关键路径 | A+B |
-| R-10 | 文档与代码不一致 | 中 | 中 | 实际字段/API和文档不同 | PR必须更新文档；Day26专项核对 | A+B |
-| R-11 | 演示网络/模型服务异常 | 中 | 高 | 录制前服务不稳定 | 提前演练；保留真实运行证据；样例仅标记演示数据 | A+B |
-| R-12 | 最终交付时间不足 | 中 | 高 | Day20未冻结MVP | 取消P1；预留Day26-30交付；不牺牲测试部署 | A+B |
-| R-13 | 公网部署缺少认证 | 中 | 高 | 有人要求直接开放公网访问 | 默认回环绑定；无认证不暴露公网；写入限制说明 | B |
-| R-14 | 第三方依赖许可不兼容 | 低 | 中 | 发布前发现特殊许可证 | Release前核查依赖许可证并记录 | A+B |
+| ID | 风险描述 | 概率 | 影响 | 等级 | 预警信号 | 应对策略 | 负责人 | 状态 | 更新日期 |
+|---|---|---|---|---|---|---|---|---|---|
+| R-01 | 模型API不可用或Key无效 | 中 | 高 | 高 | Day 2无法完成真实调用 | Day 2做Spike；准备一个备用服务商；统一适配层 | B | 监控中 | 2026-11-11 |
+| R-02 | AI输出格式不稳定 | 高 | 高 | 高 | Schema解析失败率上升 | JSON Schema/Pydantic校验、一次修复重试、固定样本集 | B | 监控中 | 2026-11-11 |
+| R-03 | AI擅自补充未给出的规则 | 中 | 高 | 高 | 输出出现原文没有的确定规则 | Prompt只提取原文事实，缺失条件输出为澄清问题；禁止模型推测写入需求/标准；用户手动补充答案并确认；进行事实忠实度评测 | A+B | 监控中 | 2026-11-11 |
+| R-04 | 功能范围蔓延 | 高 | 高 | 高 | 不断提出账号、协作、RAG等需求 | P0/P1边界；Day20冻结；新增需求必须交换范围 | A | 监控中 | 2026-11-11 |
+| R-05 | 前后端契约不一致 | 中 | 中 | 中 | 联调时字段频繁变更 | Day6冻结API Schema；PR更新契约 | A+B | 监控中 | 2026-11-11 |
+| R-06 | PostgreSQL迁移或卷配置错误 | 中 | 高 | 高 | 容器重启丢数据/迁移失败 | Day7验证健康检查；集成测试用PG；备份恢复 | B | 监控中 | 2026-11-11 |
+| R-07 | Docker在干净环境无法部署 | 中 | 高 | 高 | 本机可运行但干净机器失败 | Day 25完成干净环境验证；开发默认 postgres:17-alpine 仅用于开发；Release 前锁定不可变镜像 Digest | B | 监控中 | 2026-11-11 |
+| R-08 | 密钥误提交或日志泄露 | 中 | 高 | 高 | Git扫描发现Key | `.env`忽略、密钥扫描、演示脱敏、立即轮换 | B | 监控中 | 2026-11-11 |
+| R-09 | 两人工作量分配不均 | 中 | 中 | 中 | 某模块长期阻塞 | 每日同步；任务WIP限制；共同处理关键路径 | A+B | 监控中 | 2026-11-11 |
+| R-10 | 文档与代码不一致 | 中 | 中 | 中 | 实际字段/API和文档不同 | PR必须更新文档；Day26专项核对 | A+B | 监控中 | 2026-11-11 |
+| R-11 | 演示网络/模型服务异常 | 中 | 高 | 高 | 录制前服务不稳定 | 提前演练；保留真实运行证据；样例仅标记演示数据 | A+B | 监控中 | 2026-11-11 |
+| R-12 | 最终交付时间不足 | 中 | 高 | 高 | Day20未冻结MVP | 取消P1；预留Day26-30交付；不牺牲测试部署 | A+B | 监控中 | 2026-11-11 |
+| R-13 | 公网部署缺少认证 | 中 | 高 | 高 | 有人要求直接开放公网访问 | 默认回环绑定；无认证不暴露公网；写入限制说明 | B | 监控中 | 2026-11-11 |
+| R-14 | 第三方依赖许可不兼容 | 低 | 中 | 低 | 发布前发现特殊许可证 | Release前核查依赖许可证并记录；已识别 psycopg 3 为 LGPL-3.0-only（以未修改独立库经 SQLAlchemy 调用，与 MIT 兼容），详见 THIRD-PARTY-NOTICES.md；发布前按锁定版本复核 | A+B | 监控中 | 2026-11-11 |
 
 ## 风险复核规则
 
@@ -2090,23 +2203,26 @@ MVP没有账号认证和多租户隔离，不适合直接作为公网多用户�
 
 | 类别 | 具体文件/成果 | 负责人 | 计划完成日 | 形成方式 | 验收证据 |
 |---|---|---|---|---|---|
-| 1 源代码 | frontend/、backend/、tests/、迁移、配置示例 | A前端；B后端 | Day 25 | 实际编码与审查 | Git提交、测试报告 |
-| 2 部署包/系统 | Dockerfile、Compose、Nginx配置、.env.example、部署手册 | B | Day 25 | 构建和干净环境验证 | 容器状态、访问截图、部署记录 |
+| 1 源代码 | frontend/、backend/、tests/、迁移、配置示例 | A前端；B后端 | Day 25 | 实际编码与审查 | Git提交、测试报告、lock文件已提交 |
+| 2 部署包/系统 | Dockerfile、Compose、Nginx配置、.env.example、部署手册 | B | Day 25 | 构建和干净环境验证 | 容器状态、访问截图、部署记录、lock文件已提交 |
 | 3 工程文档 | docs/全部设计、计划、测试、维护文档 | A/B分工 | Day 27 | 持续维护与最终核对 | 文档清单、评审记录 |
-| 4 开源社区 | 真实GitHub/Gitee仓库、LICENSE、README、Release | B主责，A协助 | Day 29 | 人工创建与发布 | 仓库URL、Release URL、Commit SHA |
-| 5 汇报PPT | 项目成果汇报.pptx | A主责 | Day 28 | 以真实截图和数据制作 | 文件、演练记录 |
-| 6 操作视频 | ReqFlow_AI_Demo.mp4 | A主责，B演示部署 | Day 28 | OBS录屏和剪辑 | 视频文件、播放检查 |
-| 7 项目总结 | 项目总结报告.md/docx | A/B共同 | Day 30 | 基于记录和实际证据填写 | 双方确认、证据链接 |
+| 4 开源社区 | 真实GitHub/Gitee仓库、LICENSE、README、Release | B主责，A协助 | Day 29 | 人工创建与发布 | 仓库URL、Release URL、Commit SHA、依赖许可证清单（THIRD-PARTY-NOTICES.md）已随仓库发布 |
+| 5 汇报PPT | ReqFlow_AI_项目汇报.pptx | A主责 | Day 28 | 以真实截图和数据制作 | 文件、演练记录 |
+| 6 操作视频 | ReqFlow_AI_系统操作演示.mp4 | A主责，B演示部署 | Day 28 初版，Day 29 定稿 | OBS录屏和剪辑 | 视频文件、播放检查 |
+| 7 项目总结 | project-summary.md | A/B共同 | Day 30 | 基于记录和实际证据填写 | 双方确认、证据链接 |
 
 ## 2. 最终验收表
 
 | 编号 | 验收项 | 完成标准 | 方法 | 实际状态/证据 |
 |---|---|---|---|---|
-| A-01 | 项目创建 | 新建、列表、编辑、删除可用 | TC-001至TC-004 | 待执行 |
+| A-01 | 项目创建 | 新建、列表、编辑、删除可用 | TC-001至TC-004、TC-034 | 待执行 |
+| A-01a | 需求输入校验 | 空文本/超长被拒绝且不调用模型 | TC-005、TC-027 | 待执行 |
 | A-02 | AI需求分析 | 实际调用模型并生成结构化需求 | TC-006/007 | 待执行 |
-| A-03 | AI错误处理 | 配置错误、超时、非法JSON处理正确 | TC-008/009 | 待执行 |
+| A-03 | AI错误处理 | 配置错误、超时、非法JSON处理正确 | TC-008/009、TC-026（超时状态展示） | 待执行 |
 | A-04 | 需求确认 | 可编辑需求、处理问题、确认状态 | TC-010至TC-013、TC-031（验收标准编辑） | 待执行 |
 | A-05 | AI用例生成 | 基于已确认需求生成且关联正确 | TC-014/015/032/033 | 待执行 |
+| A-05a | 测试用例编辑 | 修改步骤/预期结果后刷新不丢失 | TC-016 | 待执行 |
+| A-05b | 需求编辑状态联动与用例替换 | CONFIRMED需求被编辑后回DRAFT且旧用例保留可导出；重新确认并再次生成后，该需求旧用例被新用例替换，其他需求用例不受影响 | TC-035 | 待执行 |
 | A-06 | 导出 | Markdown和CSV可读取且字段正确 | TC-017/018 | 待执行 |
 | A-06a | 示例需求 | 静态示例填充/清空，不写入数据库直至提交 | TC-025 | 待执行 |
 | A-07 | PostgreSQL | 迁移成功、CRUD正确 | DB集成测试 | 待执行 |
@@ -2130,10 +2246,15 @@ ReqFlow-AI/
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
 ├── CHANGELOG.md
+├── THIRD-PARTY-NOTICES.md            # 第三方依赖许可证清单
+├── AUDIT_REPORT.md                   # 对抗性审查报告
+├── MASTER_PROJECT_DOCUMENT.md        # 完整规划总文档（docs/镜像）
 ├── .gitignore
+├── .dockerignore                     # Docker构建上下文排除规则
 ├── frontend/                         # 实际前端源码
 ├── backend/                          # 实际后端源码
 ├── tests/                            # 自动化测试
+├── tools/                            # 一致性检查脚本与结果清单（开发阶段创建，OPEN-10）
 ├── deploy/                           # Compose、Nginx、环境变量示例
 ├── docs/                             # 工程文档
 ├── templates/                        # 过程模板
@@ -2145,9 +2266,11 @@ ReqFlow-AI/
     └── project-summary.md
 ```
 
+PPT 与视频同时以 Release 附件发布（见 docs/15）。
+
 ## 4. 当前文档包的交付边界
 
-本压缩包当前交付的是规划与工程文档、部署配置草案和模板。对抗性审查详情见仓库根目录`AUDIT_REPORT.md`。它不包含实际`frontend/`、`backend/`、`tests/`源代码，也不包含`frontend/Dockerfile`和`backend/Dockerfile`；因此当前不能直接构建并运行完整系统。上述文件必须在开发期间按本基线创建，并在Day 25前完成Compose干净环境部署验证。不得将本规划包作为已完成的“源代码/部署包”提交。
+本压缩包当前交付的是规划与工程文档、部署配置草案和模板。对抗性审查详情见仓库根目录`AUDIT_REPORT.md`。它不包含实际`frontend/`、`backend/`、`tests/`源代码，也不包含`frontend/Dockerfile`和`backend/Dockerfile`；因此当前不能直接构建并运行完整系统。上述文件必须在开发期间按本基线创建，并在Day 25完成Compose干净环境部署验证。不得将本规划包作为已完成的“源代码/部署包”提交。LICENSE 当前为待定稿占位版本（版权主体于发布前替换，见 docs/15 §2）。
 
 ## 5. 最终签字
 
@@ -2163,26 +2286,26 @@ ReqFlow-AI/
 
 # 21 需求追踪矩阵
 
-本矩阵覆盖PRD全部FR-001至FR-017及NFR-001至NFR-010。P1/P2需求标记为延期，不属于30天MVP验收；其余P0需求必须有测试或评审证据。
+本矩阵覆盖PRD全部FR-001至FR-017及NFR-001至NFR-011。P1/P2需求标记为延期，不属于30天MVP验收；其余P0需求必须有测试或评审证据。UC 引用均指向 docs/24（用例规格唯一主源）。
 
 ## 1. 功能需求追踪
 
 | 需求ID | 需求描述 | 优先级/基线 | 设计章节 | API/数据 | 测试/验收 | 证据 |
 |---|---|---|---|---|---|---|
 | FR-001 | 创建项目 | P0 | PRD 6、UC-01、UI 3 | POST /api/v1/projects；projects | TC-001/002 | 项目创建截图/API测试 |
-| FR-002 | 项目列表 | P0 | PRD 6、UI 3 | GET /api/v1/projects；projects | TC-001 | 列表与分页测试 |
+| FR-002 | 项目列表 | P0 | PRD 6、UI 3 | GET /api/v1/projects；projects | TC-001/034 | 列表与分页测试 |
 | FR-003 | 项目详情/编辑/删除 | P0 | PRD 6、UC-01、DB 3.1 | GET/PATCH/DELETE /api/v1/projects/{id} | TC-003/004 | CRUD及级联删除测试 |
 | FR-004 | 需求输入 | P0 | PRD 6、UC-02、AI 3 | POST /api/v1/projects/{id}/analysis-runs；analysis_runs.source_text | TC-005/027 | 输入校验、边界测试 |
 | FR-005 | AI需求分析 | P0 | PRD 6、AI 3-5、系统设计 7.1 | analysis-runs/requirements/questions/criteria | TC-006至009 | 真实调用、失败记录、AI评估 |
-| FR-006 | 编辑需求 | P0 | PRD 6、UI 3 | PATCH /api/v1/requirements/{id}；requirements | TC-010 | 修改后持久化测试 |
+| FR-006 | 编辑需求 | P0 | PRD 6、UI 3 | PATCH /api/v1/requirements/{id}；requirements | TC-010/035 | 修改后持久化测试；CONFIRMED需求编辑后状态回DRAFT、既有用例保留 |
 | FR-007 | 处理待确认问题 | P0 | PRD 6、AI 3、UC-03 | PATCH /api/v1/clarification-questions/{id} | TC-011/012 | 状态和回答持久化 |
 | FR-008 | 编辑验收标准 | P0 | PRD 6、DB 3.5 | PATCH /api/v1/acceptance-criteria/{id} | TC-031 | 字段和关联测试 |
 | FR-009 | 确认需求 | P0 | PRD 7、UC-03 | POST /api/v1/requirements/{id}/confirm | TC-013 | 状态与前置规则测试 |
-| FR-010 | AI测试用例生成 | P0 | PRD 6、AI 3、系统设计 7.2 | POST /api/v1/projects/{id}/test-generation-runs；test_cases | TC-014/015/032/033 | 真实模型调用、来源关联、信息不足/模型失败时全量拒绝并记录失败运行 |
+| FR-010 | AI测试用例生成 | P0 | PRD 6、AI 3、系统设计 7.2 | POST /api/v1/projects/{id}/test-generation-runs；test_cases | TC-014/015/032/033/035 | 真实模型调用、来源关联、信息不足/模型失败时全量拒绝并记录失败运行；重新生成按需求替换旧用例 |
 | FR-011 | 编辑测试用例 | P0 | PRD 6、DB 3.7 | PATCH /api/v1/test-cases/{id} | TC-016 | 编辑持久化测试 |
 | FR-012 | Markdown导出 | P0 | PRD 6、API 6 | GET /api/v1/projects/{id}/exports/requirements.md | TC-017 | 文件内容和编码 |
 | FR-013 | CSV导出 | P0 | PRD 6、API 6 | GET /api/v1/projects/{id}/exports/test-cases.csv | TC-018 | CSV内容、转义及编码 |
-| FR-014 | 示例需求输入 | P0 | PRD 6、UI 3、用户手册 2-3 | 前端静态样例，不调用API、不写DB | TC-025 | 输入框截图、未提交前无DB写入证明 |
+| FR-014 | 示例需求输入 | P0 | PRD 6、UC-02、UI 3、用户手册 3、7 | 前端静态样例，不调用API、不写DB | TC-025 | 输入框截图、未提交前无DB写入证明 |
 | FR-015 | 测试用例质量建议 | P1，延期 | PRD 6 | 不纳入MVP | 不测试；范围冻结后不实现 | 若未来实现再增测试 |
 | FR-016 | 需求模板 | P1，延期 | PRD 6 | 不纳入MVP | 不测试；范围冻结后不实现 | 若未来实现再增测试 |
 | FR-017 | PDF导出 | P2，不纳入 | PRD 6 | 不纳入MVP | 不测试 | 后续版本评估 |
@@ -2201,6 +2324,7 @@ ReqFlow-AI/
 | NFR-008 | 需求/测试及AI运行可追踪 | DB设计、AI设计、API | TC-029 | provider/model/prompt_version和requirement_id记录 |
 | NFR-009 | 数据备份恢复 | DB设计、部署手册 | TC-022 | pg_dump及测试实例恢复记录 |
 | NFR-010 | 非AI列表/详情P95目标 | PRD 9 | TC-030 | 固定测试环境的P50/P95记录；目标未达标如实说明 |
+| NFR-011 | 健康检查（db/backend/web三级） | 系统设计 3、部署手册 6 | 部署验证/审查（TC-021） | 部署验证记录（三容器健康状态与端点判定输出） |
 
 ## 3. 变更规则
 
@@ -2358,7 +2482,7 @@ ReqFlow-AI/
 
 # 24 用例规格说明
 
-本文件将PRD中的核心用例独立整理，供设计、开发和验收引用。
+本文档为用例规格唯一主源，供设计、开发和验收引用；PRD（docs/05 §12）仅保留用例摘要与指向本文档的指针。
 
 ## UC-01 项目创建与管理
 
@@ -2375,10 +2499,10 @@ ReqFlow-AI/
 - 主要参与者：用户；次要参与者：外部模型服务。
 - 前置条件：项目存在，模型配置已设置，需求不为空且未超过长度限制。
 - 触发：点击“AI分析”。
-- 主流程：后端校验→建立运行记录→生成Prompt→调用模型→解析结构化结果→Pydantic校验→事务保存→前端展示草稿。
-- 备选流程：配置缺失、超时、限流、模型拒答、JSON非法或输出截断时，返回明确错误，不保存不完整业务结果。
+- 主流程：用户输入需求文本，或点击“加载示例需求”将前端内置静态示例文本填入输入框（可清空/修改，未提交前不写入数据库）→点击“AI分析”→后端校验→建立运行记录→生成Prompt→调用模型→解析结构化结果→Pydantic校验→事务保存→前端展示草稿。
+- 备选流程：配置缺失、超时、限流、模型拒答、JSON非法或输出截断时，返回明确错误，不保存不完整业务结果；加载示例文本后清空且不提交，不产生任何数据库记录。
 - 后置条件：成功时分析记录和结构化需求保存；失败时保留失败运行记录。
-- 关联需求：FR-004、FR-005。
+- 关联需求：FR-004、FR-005、FR-014。
 
 ## UC-03 审阅需求和澄清问题
 
@@ -2395,9 +2519,9 @@ ReqFlow-AI/
 - 主要参与者：用户；次要参与者：外部模型服务。
 - 前置条件：至少一条已确认需求。
 - 触发：用户选择需求并点击生成。
-- 主流程：后端再次检查状态和项目归属→构建上下文→模型生成→校验每条用例来源→持久化→用户编辑→导出CSV。
+- 主流程：后端再次检查状态和项目归属→构建上下文→模型生成→校验每条用例来源→持久化→用户编辑→导出CSV测试用例，需求页导出Markdown需求文档。
 - 备选流程：无确认需求提示先确认；任一所选需求不足以形成明确预期结果时，整体返回`INSUFFICIENT_REQUIREMENT_DETAIL`且不保存部分用例；模型调用失败则显示错误；导出失败不改变已保存用例。
-- 后置条件：测试用例与需求关联并持久化。
+- 后置条件：测试用例与需求关联并持久化；生成成功时，所选需求名下的旧用例已在同一生成事务内被删除并由新用例替换（按需求替换，与全有或全有一致；生成失败不删旧用例）。
 - 关联需求：FR-010至FR-013。
 
 ## UC-05 Docker部署与数据恢复
@@ -2408,7 +2532,7 @@ ReqFlow-AI/
 - 主流程：配置.env→Compose校验→启动PostgreSQL→健康检查→后端迁移→API就绪→Web就绪→浏览器访问。
 - 备选流程：DB未ready则backend不启动；迁移失败时检查日志和备份；AI未配置时系统仍可启动但AI入口提示配置缺失。
 - 后置条件：Web、Backend、DB健康，数据卷持久化。
-- 关联需求：NFR-001、NFR-002、NFR-009。
+- 关联需求：NFR-001、NFR-002、NFR-009、NFR-011。
 
 ---
 
@@ -2421,16 +2545,20 @@ ReqFlow-AI/
 | Docker Compose | https://docs.docker.com/compose/gettingstarted/ | 服务编排、健康检查、depends_on、命名卷 |
 | PostgreSQL容器部署 | https://docs.docker.com/guides/postgresql/ | 官方镜像环境变量、数据卷和备份注意事项 |
 | FastAPI容器化 | https://fastapi.tiangolo.com/deployment/docker/ | 镜像构建和容器运行方式 |
+| Pydantic | https://docs.pydantic.dev/ | 请求/响应模型、字段校验和AI输出JSON Schema |
 | SQLAlchemy PostgreSQL | https://docs.sqlalchemy.org/en/20/dialects/postgresql.html | psycopg连接方言、类型和数据库适配 |
+| psycopg 3 | https://www.psycopg.org/psycopg3/ | PostgreSQL驱动、连接参数和连接池行为 |
 | SQLAlchemy asyncio（仅供参考） | https://docs.sqlalchemy.org/en/20/orm/extensions/asyncio.html | 本项目首版选择同步模式，不需引入异步Session复杂度 |
 | Vue | https://vuejs.org/guide/ | Vue 3组件、路由和组合式API |
+| Element Plus | https://element-plus.org/ | Vue 3 UI组件库、组件API和按需引入 |
 | Vite | https://vite.dev/guide/ | 前端构建与开发服务器 |
 | Alembic | https://alembic.sqlalchemy.org/ | 数据库迁移管理 |
+| pytest | https://docs.pytest.org/ | 后端测试组织、fixture和PostgreSQL集成测试 |
 
 ## 版本冻结原则
 
 1. Day 2记录Python、Node、PostgreSQL、Docker和依赖的可用版本。
 2. 选取稳定、团队环境可安装的版本，不追求使用最新版本。
-3. 前后端依赖分别锁版本，容器基础镜像固定主/次版本或Digest。
+3. 前后端依赖分别锁版本并提交lock文件，容器基础镜像固定主/次版本或Digest。
 4. 版本变更必须在PR中说明原因并运行回归测试。
 5. 项目发布时记录Docker版本、Compose版本、PostgreSQL版本和模型版本。

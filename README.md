@@ -41,9 +41,9 @@ ReqFlow AI 面向软件工程学生、初级产品人员和小型团队中的个
 | 数据库 | **PostgreSQL 17（容器化）** | 唯一正式数据库；不使用SQLite |
 | AI | 可配置的大模型API适配器 | 不在本项目训练模型 |
 | 部署 | **Docker + Docker Compose** | 三个核心服务一键启动 |
-| 测试 | pytest、前端测试工具、人工端到端验收 | 以核心闭环为重点 |
+| 测试 | pytest、Vitest（候选，Day 7 技术验证后确定）、人工端到端验收 | 以核心闭环为重点 |
 
-依赖版本应在第2天核查官方兼容矩阵后锁定，并提交 lock 文件；PostgreSQL正式Release前锁定已验证的镜像Digest，不将浮动标签作为最终发布依据。
+依赖版本 Day 2 记录可用版本，Day 2-7 兼容性测试后锁定版本并提交 lock 文件；PostgreSQL正式Release前锁定已验证的镜像Digest，不将浮动标签作为最终发布依据。
 
 ## 4. 一键部署目标
 
@@ -52,7 +52,7 @@ ReqFlow AI 面向软件工程学生、初级产品人员和小型团队中的个
 ```bash
 # 1. 获取代码
 git clone <实际仓库地址>
-cd ReqFlow-AI
+cd ReqFlow-AI  # 目录名以实际克隆结果为准
 
 # 2. 复制配置并修改密码、模型服务信息
 cp deploy/.env.example deploy/.env
@@ -85,11 +85,18 @@ ReqFlow-AI/
 ├── docs/                     # 完整工程文档
 ├── templates/                # 任务、评审、测试记录模板
 ├── tests/                    # 自动化测试（开发阶段创建）
+├── tools/                    # 一致性检查脚本与结果清单（开发阶段创建，OPEN-10）
+├── artifacts/                # 交付成果——PPT/视频/报告，开发阶段产生
 ├── .gitignore
+├── .dockerignore             # Docker构建上下文排除规则
+├── README.md
 ├── LICENSE
 ├── CONTRIBUTING.md
 ├── CODE_OF_CONDUCT.md
-└── CHANGELOG.md
+├── CHANGELOG.md
+├── THIRD-PARTY-NOTICES.md    # 第三方依赖许可证清单
+├── AUDIT_REPORT.md           # 对抗性审查报告
+└── MASTER_PROJECT_DOCUMENT.md # 完整规划总文档（docs/镜像）
 ```
 
 ## 7. 文档导航

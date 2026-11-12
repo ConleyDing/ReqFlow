@@ -134,20 +134,20 @@ sequenceDiagram
   User->>UI: 选择已确认需求并生成
   UI->>API: POST /projects/{id}/test-generation-runs
   API->>DB: 校验项目归属和CONFIRMED状态
-  alt 没有有效的已确认需求
+  alt 预检失败（三种拒绝情形之一）
     API-->>UI: 422 NO_CONFIRMED_REQUIREMENTS（不调用模型/不建运行记录）
   else 有效需求
     API->>DB: 创建RUNNING test_generation_run
     API->>AI: generate(canonical requirements)
     AI->>LLM: Prompt + Schema
-    LLM-->>AI: 用例JSON或信息不足错误
+    LLM-->>AI: 用例JSON或信息不足信号
     alt 输出可用且全部需求信息充分
       AI->>AI: 校验字段和需求ID映射
-      API->>DB: 事务保存全部用例并标记SUCCEEDED
-      API-->>UI: 返回用例列表
-    else 模型失败/信息不足/结构错误
+      API->>DB: 事务保存全部用例（先删除所选需求名下旧用例）并标记SUCCEEDED
+      API-->>UI: 201返回运行记录（内嵌items用例列表）
+    else 模型失败/信息不足信号/结构错误
       API->>DB: 标记FAILED并保存脱敏错误，不保存部分用例
-      API-->>UI: 返回明确业务错误
+      API-->>UI: 返回明确业务错误（信息不足信号由后端转换为422 INSUFFICIENT_REQUIREMENT_DETAIL）
     end
   end
 ```
@@ -166,12 +166,16 @@ sequenceDiagram
 }
 ```
 
+`error`对象还可携带可选的`details`字符串数组，用于承载可定位的业务细节（如`INSUFFICIENT_REQUIREMENT_DETAIL`时给出各需求的`requirement_code`与缺失信息摘要）；完整结构与AI错误码映射表见`docs/09-api-design.md`§1、§8。
+
 - 400：请求格式错误。
 - 404：项目/需求/用例不存在。
 - 409：状态冲突或重复操作。
-- 422：字段校验或业务前置条件不满足。
-- 429：模型服务限流。
-- 502/503：模型服务或外部依赖不可用。
+- 422：字段校验或业务前置条件不满足（含`NO_CONFIRMED_REQUIREMENTS`、`INSUFFICIENT_REQUIREMENT_DETAIL`、`INPUT_TOO_LARGE`）。
+- 429：模型服务限流（`AI_RATE_LIMITED`）。
+- 502：上游模型调用失败（不可达`AI_PROVIDER_UNREACHABLE`、认证失败`AI_PROVIDER_AUTH_FAILED`、上游5xx`AI_PROVIDER_ERROR`、无效输出`AI_INVALID_OUTPUT`）。
+- 503：未配置AI（`AI_NOT_CONFIGURED`）。
+- 504：模型服务响应超时（`AI_PROVIDER_TIMEOUT`）。
 - 500：未预期服务异常；日志保留request_id，不向用户返回堆栈。
 
 ## 9. 安全设计
